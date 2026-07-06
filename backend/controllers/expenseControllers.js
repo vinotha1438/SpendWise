@@ -3,27 +3,48 @@ const db = require("../config/db");
 // Add Expense
 const addExpense = (req, res) => {
 
-    const { user_id, title, amount, category, expense_date } = req.body;
+    const {
+    title,
+    amount,
+    category,
+    payment_method,
+    expense_date,
+    notes
+} = req.body;
+
+const user_id = req.user.id;
 
     const sql = `
-        INSERT INTO expenses (user_id, title, amount, category, expense_date)
-        VALUES (?, ?, ?, ?, ?)
-    `;
+        INSERT INTO expenses
+        (user_id, title, amount, category, payment_method, expense_date, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+   `;
 
-    db.query(sql, [user_id, title, amount, category, expense_date], (err) => {
+    db.query(
+        sql,
+        [
+            user_id,
+            title,
+            amount,
+            category,
+            payment_method,
+            expense_date,
+            notes
+        ],
+        (err) => {
 
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                message: "Failed to add expense"
+            if (err) {
+                console.log(err);
+                return res.status(500).json({
+                    message: "Failed to add expense"
+                });
+            }
+
+            res.status(201).json({
+                message: "Expense Added Successfully"
             });
-        }
 
-        res.status(201).json({
-            message: "Expense Added Successfully"
         });
-
-    });
 };
 
 // Get All Expenses
@@ -50,7 +71,15 @@ const getExpenses = (req, res) => {
 const updateExpense = (req, res) => {
 
     const { id } = req.params;
-    const { title, amount, category, expense_date } = req.body;
+    const {
+        user_id,
+        title,
+        amount,
+        category,
+        payment_method,
+        expense_date,
+        notes
+    } = req.body;
 
     const sql = `
         UPDATE expenses
