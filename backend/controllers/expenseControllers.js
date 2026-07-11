@@ -50,12 +50,19 @@ const user_id = req.user.id;
 // Get All Expenses
 const getExpenses = (req, res) => {
 
-    const sql = "SELECT * FROM expenses ORDER BY expense_date DESC";
+    const user_id = req.user.id;
 
-    db.query(sql, (err, result) => {
+    const sql = `
+        SELECT * FROM expenses
+        WHERE user_id = ?
+        ORDER BY expense_date DESC
+    `;
+
+    db.query(sql, [user_id], (err, result) => {
 
         if (err) {
             console.log(err);
+
             return res.status(500).json({
                 message: "Failed to fetch expenses"
             });

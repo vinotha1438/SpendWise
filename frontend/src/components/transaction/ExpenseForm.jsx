@@ -43,9 +43,12 @@ function ExpenseForm() {
       setNotes("");
 
     } catch (error) {
-      console.error(error);
+      console.log("Error=",error);
+      console.log("Response=",error.response);
+      console.log("Request=",error.request);
+      console.log("Message=",error.message);
 
-      alert(error.response?.data?.message || "Failed to save expense");
+      alert("Failed to save expense");
     }
   };
 

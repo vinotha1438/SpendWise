@@ -85,7 +85,7 @@ const loginUser = (req, res) => {
                 expiresIn: "1h"
             }
         );
-    
+        console.log("Logged in User ID:",user.id);
         console.log("Generated Token:", token);
 
         res.status(200).json({
