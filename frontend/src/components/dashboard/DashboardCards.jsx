@@ -1,20 +1,32 @@
 import StatCard from "./StatCard";
 
-function DashboardCards({ expenses }) {
+function DashboardCards({ expenses, income }) {
   const totalExpense = expenses.reduce(
-    (total, expense) => total + Number(expense.amount),
+    (total, item) => total + Number(item.amount || 0),
     0
   );
 
-  const totalTransactions = expenses.length;
+  const totalIncome = income.reduce(
+    (total, item) => total + Number(item.amount || 0),
+    0
+  );
 
-  const highestExpense =
-    expenses.length > 0
-      ? Math.max(...expenses.map((expense) => Number(expense.amount)))
+  const balance = totalIncome - totalExpense;
+
+  const savings =
+    totalIncome > 0
+      ? ((balance / totalIncome) * 100).toFixed(1)
       : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+
+      <StatCard
+        title="Total Income"
+        amount={totalIncome}
+        color="#22C55E"
+      />
+
       <StatCard
         title="Total Expense"
         amount={totalExpense}
@@ -22,23 +34,18 @@ function DashboardCards({ expenses }) {
       />
 
       <StatCard
-        title="Transactions"
-        amount={totalTransactions}
-        color="#14B8A6"
+        title="Balance"
+        amount={balance}
+        color="#3B82F6"
+      />
+
+      <StatCard
+        title="Savings %"
+        amount={savings}
+        color="#F59E0B"
         isCurrency={false}
       />
 
-      <StatCard
-        title="Highest Expense"
-        amount={highestExpense}
-        color="#F59E0B"
-      />
-
-      <StatCard
-        title="This Month"
-        amount={totalExpense}
-        color="#3B82F6"
-      />
     </div>
   );
 }

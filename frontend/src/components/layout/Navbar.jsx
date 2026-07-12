@@ -5,26 +5,90 @@ function Navbar() {
   return (
     <div
       style={{
-        height: "70px",
-        background: "white",
+        height: "75px",
+        background: "#111827",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         padding: "0 25px",
-        boxShadow: "0 2px 5px rgba(0,0,0,.08)",
+        borderBottom: "1px solid #1F2937",
       }}
     >
-      <h2>Dashboard</h2>
+      <div>
+        <h2
+          style={{
+            color: "white",
+            margin: 0,
+          }}
+        >
+          Dashboard
+        </h2>
+
+        <small
+          style={{
+            color: "#94A3B8",
+          }}
+        >
+          Welcome back 👋
+        </small>
+      </div>
+
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "20px",
+          gap: "18px",
         }}
       >
-        <Search size={20} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            background: "#1F2937",
+            padding: "8px 15px",
+            borderRadius: "10px",
+            width: "250px",
+          }}
+        >
+          <Search
+            size={18}
+            color="#94A3B8"
+          />
 
-        <Bell size={20} />
+          <input
+            type="text"
+            placeholder="Search..."
+            style={{
+              marginLeft: "10px",
+              background: "transparent",
+              border: "none",
+              outline: "none",
+              color: "white",
+              width: "100%",
+            }}
+          />
+        </div>
+
+        <Bell
+          color="white"
+          size={20}
+        />
+
+        <div
+          style={{
+            width: "38px",
+            height: "38px",
+            borderRadius: "50%",
+            background: "#14B8A6",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            color: "white",
+            fontWeight: "bold",
+          }}
+        >
+          V
+        </div>
 
         <AddExpenseModal />
       </div>

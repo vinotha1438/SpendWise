@@ -1,110 +1,124 @@
-import {
-  LayoutDashboard,
-  Wallet,
-  PieChart,
-  Settings,
-  Receipt,
-  Target,
-} from "lucide-react";
-import { useState } from "react";
-
-const menuItems = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Transactions",
-    icon: Wallet,
-  },
-  {
-    title: "Analytics",
-    icon: PieChart,
-  },
-  {
-    title: "Budget",
-    icon: Target,
-  },
-  {
-    title: "Reports",
-    icon: Receipt,
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-  },
-];
+import { Link, useLocation } from "react-router-dom";
 
 function Sidebar() {
-  const [activeMenu, setActiveMenu] = useState("Dashboard");
+  const location = useLocation();
+
+  const menu = [
+    { name: "Dashboard", path: "/dashboard", icon: "🏠" },
+    { name: "Transactions", path: "/transactions", icon: "💳" },
+    { name: "Income", path: "/income", icon: "💰" },
+    { name: "Budget & Goals", path: "/budget", icon: "🎯" },
+    { name: "Analytics", path: "/analytics", icon: "📊" },
+    { name: "Reports", path: "/reports", icon: "📄" },
+    { name: "Financial Health", path: "/health", icon: "❤️" },
+    { name: "Recurring", path: "/recurring", icon: "🔁" },
+    { name: "Settings", path: "/settings", icon: "⚙️" },
+  ];
+
   return (
     <div
       style={{
         width: "240px",
-        height: "100vh",
         background: "#0F172A",
         color: "white",
-        padding: "20px",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
       }}
     >
-      {/* Logo */}
-      <div style={{ marginBottom: "40px" }}>
-        <h2
+      <div>
+        <div
           style={{
-            color: "#14B8A6",
-            fontWeight: "700",
+            padding: "25px",
+            borderBottom: "1px solid #1E293B",
           }}
         >
-          💰 SpendWise
-        </h2>
+          <h2
+            style={{
+              margin: 0,
+              color: "#22C55E",
+            }}
+          >
+            💰 SpendWise
+          </h2>
 
-        <p
+          <p
+            style={{
+              color: "#94A3B8",
+              fontSize: "13px",
+              marginTop: "5px",
+            }}
+          >
+            Personal Finance
+          </p>
+        </div>
+
+        <div
           style={{
-            fontSize: "13px",
-            color: "#94A3B8",
+            padding: "15px",
           }}
         >
-          Personal Finance
-        </p>
+          {menu.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              style={{
+                display: "block",
+                padding: "12px 15px",
+                marginBottom: "8px",
+                borderRadius: "10px",
+                textDecoration: "none",
+                color:
+                  location.pathname === item.path
+                    ? "#fff"
+                    : "#CBD5E1",
+
+                background:
+                  location.pathname === item.path
+                    ? "#14B8A6"
+                    : "transparent",
+
+                transition: "0.3s",
+              }}
+            >
+              {item.icon} {item.name}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      {/* Menu */}
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
+          padding: "20px",
+          borderTop: "1px solid #1E293B",
         }}
       >
-        {menuItems.map((item) => {
-          const Icon = item.icon;
+        <div
+          style={{
+            background: "#1E293B",
+            padding: "12px",
+            borderRadius: "10px",
+          }}
+        >
+          <div
+            style={{
+              color: "#22C55E",
+              fontWeight: "bold",
+            }}
+          >
+            ₹0
+          </div>
 
-          return (
-            <div
-              key={item.title}
-              onClick={() => setActiveMenu(item.title)}
-              style={{
-                 display: "flex",
-                 alignItems: "center",
-                  gap: "12px",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  background:
-                    activeMenu === item.title ? "#7f14b8" : "transparent",
-                  color:
-                    activeMenu === item.title ? "#FFFFFF" : "#CBD5E1",
-                  transition: "0.25s",
-                }}
-            >
-              <Icon size={20} />
-
-              <span>{item.title}</span>
-            </div>
-          );
-        })}
+          <small
+            style={{
+              color: "#94A3B8",
+            }}
+          >
+            Total Balance
+          </small>
+        </div>
       </div>
-      
     </div>
   );
 }

@@ -78,8 +78,8 @@ const getExpenses = (req, res) => {
 const updateExpense = (req, res) => {
 
     const { id } = req.params;
+
     const {
-        user_id,
         title,
         amount,
         category,
@@ -88,21 +88,47 @@ const updateExpense = (req, res) => {
         notes
     } = req.body;
 
+    const user_id = req.user.id;
+
     const sql = `
         UPDATE expenses
-        SET title=?, amount=?, category=?, expense_date=?
-        WHERE id=?
+        SET
+            title = ?,
+            amount = ?,
+            category = ?,
+            payment_method = ?,
+            expense_date = ?,
+            notes = ?
+        WHERE
+            id = ?
+            AND user_id = ?
     `;
 
     db.query(
         sql,
-        [title, amount, category, expense_date, id],
-        (err) => {
+        [
+            title,
+            amount,
+            category,
+            payment_method,
+            expense_date,
+            notes,
+            id,
+            user_id
+        ],
+        (err, result) => {
 
             if (err) {
                 console.log(err);
+
                 return res.status(500).json({
                     message: "Failed to update expense"
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    message: "Expense not found"
                 });
             }
 
