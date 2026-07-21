@@ -1,38 +1,29 @@
-function TransactionTable({ expenses, onDelete, onEdit }) {
-  return (
-    <div
-      style={{
-        background: "#111827",
-        borderRadius: "16px",
-        padding: "20px",
-        color: "white",
-        border: "1px solid #1F2937",
-      }}
-    >
+function TransactionTable({
+  expenses = [],
+  onEdit,
+  onDelete,
+}) {
+  if (expenses.length === 0) {
+    return (
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
+          color: "#94A3B8",
+          textAlign: "center",
+          padding: "30px",
         }}
       >
-        <h2 style={{ margin: 0 }}>Recent Transactions</h2>
-
-        <span
-          style={{
-            color: "#94A3B8",
-            fontSize: "14px",
-          }}
-        >
-          {expenses.length} Transactions
-        </span>
+        No Expenses Found
       </div>
+    );
+  }
 
+  return (
+    <div style={{ overflowX: "auto" }}>
       <table
         style={{
           width: "100%",
           borderCollapse: "collapse",
+          color: "white",
         }}
       >
         <thead>
@@ -41,138 +32,98 @@ function TransactionTable({ expenses, onDelete, onEdit }) {
               borderBottom: "1px solid #374151",
             }}
           >
-            <th
-              align="left"
-              style={{ padding: "12px", color: "#9CA3AF" }}
-            >
-              Title
-            </th>
-
-            <th
-              align="left"
-              style={{ padding: "12px", color: "#9CA3AF" }}
-            >
-              Category
-            </th>
-
-            <th
-              align="left"
-              style={{ padding: "12px", color: "#9CA3AF" }}
-            >
-              Payment
-            </th>
-
-            <th
-              align="left"
-              style={{ padding: "12px", color: "#9CA3AF" }}
-            >
-              Amount
-            </th>
-
-            <th
-              align="left"
-              style={{ padding: "12px", color: "#9CA3AF" }}
-            >
-              Date
-            </th>
-
-            <th
-              align="center"
-              style={{ padding: "12px", color: "#9CA3AF" }}
-            >
-              Action
-            </th>
+            <th style={thStyle}>Title</th>
+            <th style={thStyle}>Category</th>
+            <th style={thStyle}>Payment</th>
+            <th style={thStyle}>Amount</th>
+            <th style={thStyle}>Date</th>
+            <th style={thStyle}>Actions</th>
           </tr>
         </thead>
 
         <tbody>
-          {expenses.length === 0 ? (
-            <tr>
+          {expenses.map((expense) => (
+            <tr
+              key={expense.id}
+              style={{
+                borderBottom: "1px solid #1F2937",
+              }}
+            >
+              <td style={tdStyle}>{expense.title}</td>
+              <td style={tdStyle}>{expense.category}</td>
+              <td style={tdStyle}>{expense.payment_method}</td>
               <td
-                colSpan="6"
                 style={{
-                  textAlign: "center",
-                  padding: "30px",
-                  color: "#94A3B8",
+                  ...tdStyle,
+                  color: "#EF4444",
+                  fontWeight: "bold",
                 }}
               >
-                No Transactions Found
+                ₹{Number(expense.amount).toLocaleString()}
               </td>
-            </tr>
-          ) : (
-            expenses.map((expense) => (
-              <tr
-                key={expense.id}
+              <td style={tdStyle}>
+                {expense.expense_date
+                  ? new Date(expense.expense_date).toLocaleDateString()
+                  : "-"}
+              </td>
+
+              <td style={tdStyle}>
+                <button
+                  onClick={() =>{
+                    alert("Edit button clicked");
+                    onEdit(expense);
+                  }}
                 style={{
-                  borderBottom: "1px solid #1F2937",
+                  background: "#3B82F6",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  marginRight: "8px",
+                }}
+                >
+                ✏️ Edit
+              </button>
+
+              <button
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to delete this expense?"
+                    )
+                  ) {
+                    onDelete(expense.id);
+                  }
+                }}
+                style={{
+                  background: "#EF4444",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
                 }}
               >
-                <td style={{ padding: "14px" }}>{expense.title}</td>
-
-                <td style={{ padding: "14px" }}>
-                  {expense.category}
-                </td>
-
-                <td style={{ padding: "14px" }}>
-                  {expense.payment_method}
-                </td>
-
-                <td
-                  style={{
-                    padding: "14px",
-                    color: "#EF4444",
-                    fontWeight: "bold",
-                  }}
-                >
-                  ₹ {expense.amount}
-                </td>
-
-                <td style={{ padding: "14px" }}>
-                  {new Date(expense.expense_date).toLocaleDateString()}
-                </td>
-
-                <td
-                  style={{
-                    padding: "14px",
-                    textAlign: "center",
-                  }}
-                >
-                  <button
-                    onClick={() => onEdit(expense)}
-                    style={{
-                      background: "#3B82F6",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 12px",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      marginRight: "8px",
-                    }}
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    onClick={() => onDelete(expense.id)}
-                    style={{
-                      background: "#EF4444",
-                      color: "white",
-                      border: "none",
-                      padding: "8px 14px",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+                🗑 Delete
+              </button>
+            </td>
+            </tr>
+          ))}
+      </tbody>
+    </table>
+    </div >
   );
 }
+
+const thStyle = {
+  textAlign: "left",
+  padding: "12px",
+  color: "#CBD5E1",
+};
+
+const tdStyle = {
+  padding: "12px",
+};
 
 export default TransactionTable;

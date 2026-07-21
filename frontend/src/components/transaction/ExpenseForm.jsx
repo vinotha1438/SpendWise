@@ -3,57 +3,87 @@ import CategorySelect from "./CategorySelect";
 import PaymentSelect from "./PaymentSelect";
 import API from "../../services/api";
 
-function ExpenseForm() {
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [expenseDate, setExpenseDate] = useState("");
-  const [notes, setNotes] = useState("");
+function ExpenseForm({
+  expense = null,
+  isEdit = false,
+  onSuccess = () => {},
+}) {
+  const [title, setTitle] = useState(expense?.title || "");
+  const [amount, setAmount] = useState(expense?.amount || "");
+  const [category, setCategory] = useState(expense?.category || "");
+  const [paymentMethod, setPaymentMethod] = useState(
+    expense?.payment_method || ""
+  );
+  const [expenseDate, setExpenseDate] = useState(
+    expense?.expense_date
+      ? expense.expense_date.substring(0, 10)
+      : ""
+  );
+  const [notes, setNotes] = useState(expense?.notes || "");
 
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await API.post(
-        "/expenses",
-        {
-          title,
-          amount,
-          category,
-          payment_method: paymentMethod,
-          expense_date: expenseDate,
-          notes,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      let response;
+
+      const data = {
+        title,
+        amount,
+        category,
+        payment_method: paymentMethod,
+        expense_date: expenseDate,
+        notes,
+      };
+
+      if (isEdit) {
+        response = await API.put(
+          `/expenses/${expense.id}`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        response = await API.post(
+          "/expenses",
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
 
       alert(response.data.message);
 
-      // Clear form after successful save
-      setTitle("");
-      setAmount("");
-      setCategory("");
-      setPaymentMethod("");
-      setExpenseDate("");
-      setNotes("");
+      if (!isEdit) {
+        setTitle("");
+        setAmount("");
+        setCategory("");
+        setPaymentMethod("");
+        setExpenseDate("");
+        setNotes("");
+      }
+
+      onSuccess();
 
     } catch (error) {
-      console.log("Error=",error);
-      console.log("Response=",error.response);
-      console.log("Request=",error.request);
-      console.log("Message=",error.message);
+      console.log(error);
 
-      alert("Failed to save expense");
+      alert(
+        error.response?.data?.message ||
+        "Failed to save expense"
+      );
     }
   };
 
   return (
     <div className="mt-4 space-y-3">
+
       <input
         type="text"
         placeholder="Expense Title"
@@ -98,8 +128,9 @@ function ExpenseForm() {
         className="w-full bg-teal-500 text-white rounded-lg p-2 hover:bg-teal-600"
         onClick={handleSubmit}
       >
-        Save Expense
+        {isEdit ? "Update Expense" : "Save Expense"}
       </button>
+
     </div>
   );
 }

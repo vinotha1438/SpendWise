@@ -1,5 +1,4 @@
 import { Bell, Search } from "lucide-react";
-import AddExpenseModal from "../transaction/AddExpenseModal";
 
 function Navbar() {
   return (
@@ -21,7 +20,7 @@ function Navbar() {
             margin: 0,
           }}
         >
-          Dashboard
+          SpendWise
         </h2>
 
         <small
@@ -29,7 +28,7 @@ function Navbar() {
             color: "#94A3B8",
           }}
         >
-          Welcome back 👋
+          Personal Finance Dashboard
         </small>
       </div>
 
@@ -50,10 +49,7 @@ function Navbar() {
             width: "250px",
           }}
         >
-          <Search
-            size={18}
-            color="#94A3B8"
-          />
+          <Search size={18} color="#94A3B8" />
 
           <input
             type="text"
@@ -69,10 +65,7 @@ function Navbar() {
           />
         </div>
 
-        <Bell
-          color="white"
-          size={20}
-        />
+        <Bell color="white" size={20} />
 
         <div
           style={{
@@ -87,10 +80,8 @@ function Navbar() {
             fontWeight: "bold",
           }}
         >
-          V
+          S
         </div>
-
-        <AddExpenseModal />
       </div>
     </div>
   );

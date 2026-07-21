@@ -1,48 +1,86 @@
 import { useState } from "react";
 import API from "../../services/api";
 
-function IncomeForm() {
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [incomeDate, setIncomeDate] = useState("");
-  const [notes, setNotes] = useState("");
+function IncomeForm({
+  incomeToEdit = null,
+  onSuccess = () => {},
+}) {
+  const isEdit = !!incomeToEdit;
+
+  const [title, setTitle] = useState(incomeToEdit?.title || "");
+  const [amount, setAmount] = useState(incomeToEdit?.amount || "");
+  const [category, setCategory] = useState(incomeToEdit?.category || "");
+  const [paymentMethod, setPaymentMethod] = useState(
+    incomeToEdit?.payment_method || ""
+  );
+  const [incomeDate, setIncomeDate] = useState(
+    incomeToEdit?.income_date
+      ? incomeToEdit.income_date.substring(0, 10)
+      : ""
+  );
+  const [notes, setNotes] = useState(incomeToEdit?.notes || "");
 
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await API.post(
-        "/income",
-        {
-          title,
-          amount,
-          category,
-          payment_method: paymentMethod,
-          income_date: incomeDate,
-          notes,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      let response;
+
+      if (isEdit) {
+        response = await API.put(
+          `/income/${incomeToEdit.id}`,
+          {
+            title,
+            amount,
+            category,
+            payment_method: paymentMethod,
+            income_date: incomeDate,
+            notes,
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        response = await API.post(
+          "/income",
+          {
+            title,
+            amount,
+            category,
+            payment_method: paymentMethod,
+            income_date: incomeDate,
+            notes,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
 
       alert(response.data.message);
 
-      setTitle("");
-      setAmount("");
-      setCategory("");
-      setPaymentMethod("");
-      setIncomeDate("");
-      setNotes("");
+      onSuccess();
 
+      if (!isEdit) {
+        setTitle("");
+        setAmount("");
+        setCategory("");
+        setPaymentMethod("");
+        setIncomeDate("");
+        setNotes("");
+      }
     } catch (error) {
       console.log(error);
 
-      alert(error.response?.data?.message || "Failed to add income");
+      alert(
+        error.response?.data?.message ||
+        "Failed to save income"
+      );
     }
   };
 
@@ -71,12 +109,12 @@ function IncomeForm() {
         onChange={(e) => setCategory(e.target.value)}
       >
         <option value="">Select Category</option>
-        <option value="Salary">💵Salary</option>
+        <option value="Salary">💵 Salary</option>
         <option value="Business">Business</option>
         <option value="Freelance">Freelance</option>
         <option value="Investment">Investment</option>
         <option value="Gift">Gift</option>
-        <option value="Other">📦Other</option>
+        <option value="Other">📦 Other</option>
       </select>
 
       <select
@@ -86,8 +124,8 @@ function IncomeForm() {
       >
         <option value="">Payment Method</option>
         <option value="Cash">💵 Cash</option>
-        <option value="UPI">📱UPI</option>
-        <option value="Bank">🏦Bank</option>
+        <option value="UPI">📱 UPI</option>
+        <option value="Bank">🏦 Bank</option>
       </select>
 
       <input
@@ -108,7 +146,7 @@ function IncomeForm() {
         onClick={handleSubmit}
         className="w-full bg-green-600 text-white rounded-lg p-2 hover:bg-green-700"
       >
-        Save Income
+        {isEdit ? "Update Income" : "Save Income"}
       </button>
 
     </div>

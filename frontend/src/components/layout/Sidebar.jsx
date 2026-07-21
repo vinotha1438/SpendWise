@@ -4,15 +4,36 @@ function Sidebar() {
   const location = useLocation();
 
   const menu = [
-    { name: "Dashboard", path: "/dashboard", icon: "🏠" },
-    { name: "Transactions", path: "/transactions", icon: "💳" },
-    { name: "Income", path: "/income", icon: "💰" },
-    { name: "Budget & Goals", path: "/budget", icon: "🎯" },
-    { name: "Analytics", path: "/analytics", icon: "📊" },
-    { name: "Reports", path: "/reports", icon: "📄" },
-    { name: "Financial Health", path: "/health", icon: "❤️" },
-    { name: "Recurring", path: "/recurring", icon: "🔁" },
-    { name: "Settings", path: "/settings", icon: "⚙️" },
+    {
+      name: "Dashboard",
+      path: "/dashboard",
+      icon: "🏠",
+    },
+    {
+      name: "Income",
+      path: "/income",
+      icon: "💰",
+    },
+    {
+      name: "Budget Planner",
+      path: "/budget",
+      icon: "📅",
+    },
+    {
+      name: "Analytics",
+      path: "/analytics",
+      icon: "📊",
+    },
+    {
+      name: "Reports",
+      path: "/reports",
+      icon: "📄",
+    },
+    {
+      name: "Settings",
+      path: "/settings",
+      icon: "⚙️",
+    },
   ];
 
   return (
@@ -69,9 +90,10 @@ function Sidebar() {
                 marginBottom: "8px",
                 borderRadius: "10px",
                 textDecoration: "none",
+
                 color:
                   location.pathname === item.path
-                    ? "#fff"
+                    ? "#FFFFFF"
                     : "#CBD5E1",
 
                 background:
@@ -105,6 +127,7 @@ function Sidebar() {
             style={{
               color: "#22C55E",
               fontWeight: "bold",
+              fontSize: "18px",
             }}
           >
             ₹0

@@ -1,5 +1,4 @@
 const db = require("../config/db");
-console.log("******** NEW INCOME CONTROLLER LOADED ********");
 
 // Add Income
 const addIncome = (req, res) => {
@@ -49,27 +48,105 @@ const addIncome = (req, res) => {
 
 // Get All Income
 const getIncome = (req, res) => {
+  const user_id = req.user.id;
 
-    console.log("GET INCOME FUNCTION EXECUTED");
+  const sql = `
+    SELECT *
+    FROM income
+    WHERE user_id = ?
+    ORDER BY income_date DESC
+  `;
 
-    return res.json({
-        test: "SUCCESS"
-    });
+  db.query(sql, [user_id], (err, result) => {
+    if (err) {
+      console.log(err);
 
+      return res.status(500).json({
+        message: "Failed to fetch income",
+      });
+    }
+
+    res.json(result);
+  });
 };
-
 
 // Update Income
 const updateIncome = (req, res) => {
-  res.json({
-    message: "Update Income Working",
-  });
+  const { id } = req.params;
+
+  const {
+    title,
+    amount,
+    category,
+    payment_method,
+    income_date,
+    notes,
+  } = req.body;
+
+  const user_id = req.user.id;
+
+  const sql = `
+    UPDATE income
+    SET
+      title = ?,
+      amount = ?,
+      category = ?,
+      payment_method = ?,
+      income_date = ?,
+      notes = ?
+    WHERE id = ? AND user_id = ?
+  `;
+
+  db.query(
+    sql,
+    [
+      title,
+      amount,
+      category,
+      payment_method,
+      income_date,
+      notes,
+      id,
+      user_id,
+    ],
+    (err) => {
+      if (err) {
+        console.log(err);
+
+        return res.status(500).json({
+          message: "Failed to update income",
+        });
+      }
+
+      res.json({
+        message: "Income Updated Successfully",
+      });
+    }
+  );
 };
 
 // Delete Income
 const deleteIncome = (req, res) => {
-  res.json({
-    message: "Delete Income Working",
+  const { id } = req.params;
+  const user_id = req.user.id;
+
+  const sql = `
+    DELETE FROM income
+    WHERE id = ? AND user_id = ?
+  `;
+
+  db.query(sql, [id, user_id], (err) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        message: "Failed to delete income",
+      });
+    }
+
+    res.json({
+      message: "Income Deleted Successfully",
+    });
   });
 };
 

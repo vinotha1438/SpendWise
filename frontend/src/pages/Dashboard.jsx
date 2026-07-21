@@ -2,17 +2,29 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 
 import AppLayout from "../components/layout/AppLayout";
+import DashboardHeader from "../components/dashboard/DashboardHeader";
 import DashboardCards from "../components/dashboard/DashboardCards";
-import TransactionTable from "../components/transaction/TransactionTable";
+import ExpenseSection from "../components/dashboard/ExpenseSection";
+import IncomeSection from "../components/dashboard/IncomeSection";
 import ExpenseChart from "../components/dashboard/ExpenseChart";
 import ExpensePieChart from "../components/dashboard/ExpensePieChart";
+import ExpenseForm from "../components/transaction/ExpenseForm";
+import SpendingInsights from "../components/dashboard/SpendingInsights";
+import DailyAnalytics from "@/components/dashboard/DailyAnalytics";
+import WeeklyTrendChart from "@/components/dashboard/WeeklyTrendChart";
+import BudgetProgress from "../components/dashboard/BudgetProgress";
 
 function Dashboard() {
   const [expenses, setExpenses] = useState([]);
   const [income, setIncome] = useState([]);
+
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  const [editingExpense, setEditingExpense] = useState(null);
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
+  console.log("Dashboard Render:", showExpenseForm);
+  
   const fetchExpenses = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -61,6 +73,21 @@ function Dashboard() {
       });
 
       fetchExpenses();
+    } catch (error) {
+      alert(error.response?.data?.message || "Delete Failed");
+    }
+  };
+
+  const deleteIncome = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.delete(`/income/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       fetchIncome();
     } catch (error) {
       alert(error.response?.data?.message || "Delete Failed");
@@ -68,9 +95,16 @@ function Dashboard() {
   };
 
   const editExpense = (expense) => {
-    alert(
-      `Edit Feature Coming Next\n\nExpense: ${expense.title}`
-    );
+    alert("Inside editExpense");
+    console.log(expense);
+
+    setEditingExpense(expense);
+    setShowExpenseForm(true);
+  };
+
+  const editIncome = (item) => {
+    alert("Income Edit - Next Step");
+    console.log(item);
   };
 
   const filteredExpenses = expenses.filter((expense) => {
@@ -87,106 +121,62 @@ function Dashboard() {
 
   return (
     <AppLayout>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "25px",
-        }}
-      >
-        <div>
-          <h1
-            style={{
-              margin: 0,
-              color: "white",
-            }}
-          >
-            Dashboard
-          </h1>
-
-          <p
-            style={{
-              color: "#94A3B8",
-              marginTop: "8px",
-            }}
-          >
-            Track your expenses and manage your finances.
-          </p>
-        </div>
-      </div>
+      <DashboardHeader />
 
       <DashboardCards
         expenses={expenses}
         income={income}
       />
 
-      <div
-        style={{
-          marginTop: "30px",
-          background: "#111827",
-          padding: "20px",
-          borderRadius: "15px",
-          border: "1px solid #1F2937",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "15px",
-            marginBottom: "20px",
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Search Expense..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              flex: 1,
-              padding: "12px",
-              borderRadius: "10px",
-              border: "1px solid #374151",
-              background: "#1F2937",
-              color: "white",
-            }}
-          />
+      <DailyAnalytics
+        expenses={expenses}
+      />
 
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            style={{
-              padding: "12px",
-              borderRadius: "10px",
-              border: "1px solid #374151",
-              background: "#1F2937",
-              color: "white",
-            }}
-          >
-            <option value="">All Categories</option>
-            <option value="Food">Food</option>
-            <option value="Travel">Travel</option>
-            <option value="Shopping">Shopping</option>
-            <option value="Bills">Bills</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Health">Health</option>
-            <option value="Education">Education</option>
-            <option value="Office">Office</option>
-            <option value="Home">Home</option>
-            <option value="Others">Others</option>
-          </select>
-        </div>
+      <SpendingInsights
+        expenses={expenses}
+      />
 
-        <TransactionTable
-          expenses={filteredExpenses}
-          onDelete={deleteExpense}
-          onEdit={editExpense}
-        />
-      </div>
+      <WeeklyTrendChart
+        expenses={expenses}
+      />
+
+      <BudgetProgress
+        expenses={expenses}
+      />
+
+      <ExpenseSection
+        expenses={filteredExpenses}
+        search={search}
+        setSearch={setSearch}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        onDelete={deleteExpense}
+        onEdit={editExpense}
+      />
+
+      <IncomeSection
+        income={income}
+        onDelete={deleteIncome}
+        onEdit={editIncome}
+      />
 
       <ExpenseChart expenses={expenses} />
 
       <ExpensePieChart expenses={expenses} />
+
+      {showExpenseForm && (
+        <div
+          style={{
+            background: "red",
+            color: "white",
+            padding: "20px",
+            margin: "20px",
+            borderRadius: "10px",
+          }}
+        >
+          FORM OPENED
+        </div>
+      )}
     </AppLayout>
   );
 }

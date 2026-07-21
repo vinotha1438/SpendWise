@@ -5,6 +5,8 @@ const db = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const incomeRoutes = require("./routes/incomeRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const budgetRoutes = require("./routes/budgetRoutes");
 
 const app = express();
 
@@ -16,7 +18,10 @@ app.use(express.json());
 
 // Routes
 app.use("/", userRoutes);
-app.use("/", expenseRoutes);
+app.use(expenseRoutes);
+app.use(incomeRoutes);
+app.use(categoryRoutes);
+app.use(budgetRoutes);
 console.log("Registering Income Routes...");
 app.get("/test123", (req, res) => {
   res.send("TEST OK");

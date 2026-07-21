@@ -13,14 +13,10 @@ function DashboardCards({ expenses, income }) {
 
   const balance = totalIncome - totalExpense;
 
-  const savings =
-    totalIncome > 0
-      ? ((balance / totalIncome) * 100).toFixed(1)
-      : 0;
+  const savings = balance;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-
       <StatCard
         title="Total Income"
         amount={totalIncome}
@@ -40,12 +36,10 @@ function DashboardCards({ expenses, income }) {
       />
 
       <StatCard
-        title="Savings %"
+        title="💰 Savings"
         amount={savings}
         color="#F59E0B"
-        isCurrency={false}
       />
-
     </div>
   );
 }
