@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Income from "./pages/Income";
 import BudgetPlanner from "./pages/BudgetPlanner";
+import Reports from "./pages/Reports";
+import Analytics from "./pages/Analytics";
 
 function App() {
   return (
@@ -20,6 +22,15 @@ function App() {
         <Route
           path="/budget"
           element={<BudgetPlanner />}
+        />
+        <Route
+          path="/analytics"
+          element={<Analytics />}
+        />
+
+        <Route
+          path="/reports"
+          element={<Reports />}
         />
       </Routes>
     </BrowserRouter>
