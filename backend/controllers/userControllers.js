@@ -4,20 +4,22 @@ const jwt = require("jsonwebtoken");
 
 // Register User
 const registerUser = (req, res) => {
-
     const { full_name, email, password } = req.body;
 
     const checkSql = "SELECT * FROM users WHERE email = ?";
 
     db.query(checkSql, [email], (err, rows) => {
-
         if (err) {
             console.log(err);
-            return res.status(500).json({ message: "Database Error" });
+            return res.status(500).json({
+                message: "Database Error",
+            });
         }
 
         if (rows.length > 0) {
-            return res.status(400).json({ message: "Email already exists" });
+            return res.status(400).json({
+                message: "Email already exists",
+            });
         }
 
         const hashedPassword = bcrypt.hashSync(password, 10);
@@ -27,41 +29,41 @@ const registerUser = (req, res) => {
             VALUES (?, ?, ?)
         `;
 
-        db.query(insertSql, [full_name, email, hashedPassword], (err) => {
+        db.query(
+            insertSql,
+            [full_name, email, hashedPassword],
+            (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({
+                        message: "Registration Failed",
+                    });
+                }
 
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ message: "Registration Failed" });
+                res.status(201).json({
+                    message: "User Registered Successfully",
+                });
             }
-
-            res.status(201).json({
-                message: "User Registered Successfully"
-            });
-
-        });
-
+        );
     });
-
 };
 
 // Login User
 const loginUser = (req, res) => {
-
     const { email, password } = req.body;
 
     const sql = "SELECT * FROM users WHERE email = ?";
 
     db.query(sql, [email], (err, rows) => {
-
         if (err) {
             return res.status(500).json({
-                message: "Database Error"
+                message: "Database Error",
             });
         }
 
         if (rows.length === 0) {
             return res.status(404).json({
-                message: "User not found"
+                message: "User not found",
             });
         }
 
@@ -71,33 +73,60 @@ const loginUser = (req, res) => {
 
         if (!isMatch) {
             return res.status(401).json({
-                message: "Invalid Password"
+                message: "Invalid Password",
             });
         }
 
         const token = jwt.sign(
             {
                 id: user.id,
-                email: user.email
+                email: user.email,
             },
             "spendwise_secret_key",
             {
-                expiresIn: "1h"
+                expiresIn: "1h",
             }
         );
-        console.log("Logged in User ID:",user.id);
-        console.log("Generated Token:", token);
 
         res.status(200).json({
             message: "Login Successful",
-            token: token
+            token,
         });
-
     });
+};
 
+// Get Logged-in User Profile
+const getProfile = (req, res) => {
+    const sql = `
+        SELECT
+            id,
+            full_name,
+            email
+        FROM users
+        WHERE id = ?
+    `;
+
+    db.query(sql, [req.user.id], (err, rows) => {
+        if (err) {
+            console.log(err);
+
+            return res.status(500).json({
+                message: "Database Error",
+            });
+        }
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        res.status(200).json(rows[0]);
+    });
 };
 
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    getProfile,
 };
