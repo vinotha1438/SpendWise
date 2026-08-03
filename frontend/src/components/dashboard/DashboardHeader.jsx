@@ -1,43 +1,64 @@
 import AddExpenseModal from "../transaction/AddExpenseModal";
+import ExportPDF from "../reports/ExportPDF";
+import ExportExcel from "../reports/ExportExcel";
 
 function DashboardHeader() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "25px",
-        background: "#111827",
-        padding: "20px",
-        borderRadius: "15px",
-        border: "1px solid #1F2937",
-      }}
-    >
-      <div>
-        <h1
-          style={{
-            margin: 0,
-            color: "white",
-            fontSize: "32px",
-            fontWeight: "bold",
-          }}
-        >
-          Dashboard
-        </h1>
+  const today = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-        <p
-          style={{
-            color: "#94A3B8",
-            marginTop: "8px",
-          }}
-        >
-          Track your expenses and manage your finances.
-        </p>
+  const hour = new Date().getHours();
+
+  let greeting = "Good Evening 🌙";
+
+  if (hour < 12) greeting = "Good Morning ☀️";
+  else if (hour < 17) greeting = "Good Afternoon 🌤️";
+
+  return (
+    <section className="mb-8">
+
+      <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-700 p-6 shadow-xl">
+
+        <div className="flex flex-col lg:flex-row justify-between gap-6">
+
+          <div>
+
+            <p className="text-emerald-300 font-semibold">
+              {greeting}
+            </p>
+
+            <h1 className="text-3xl font-bold text-white mt-2">
+              Welcome Back 👋
+            </h1>
+
+            <p className="text-slate-200 mt-3">
+              Track your income, expenses and savings in one place.
+            </p>
+
+            <div className="mt-4 inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-white">
+              📅 {today}
+            </div>
+
+          </div>
+
+          <div className="flex flex-wrap gap-3 self-start lg:self-center">
+
+            <AddExpenseModal />
+
+            <ExportPDF />
+
+            <ExportExcel />
+
+          </div>
+
+        </div>
+
       </div>
 
-      <AddExpenseModal />
-    </div>
+    </section>
   );
 }
 

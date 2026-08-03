@@ -3,29 +3,33 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import IncomeForm from "./IncomeForm";
 
-function AddIncomeModal() {
+function AddIncomeModal({
+  open,
+  setOpen,
+  incomeToEdit = null,
+  onSuccess,
+}) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          style={{ display: "none" }}
-          id="openIncomeModal"
-        >
-          Open
-        </button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="sm:max-w-lg">
 
-      <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Income</DialogTitle>
+          <DialogTitle>
+            {incomeToEdit ? "Edit Income" : "Add New Income"}
+          </DialogTitle>
         </DialogHeader>
 
-        <IncomeForm />
+        <IncomeForm
+          incomeToEdit={incomeToEdit}
+          onSuccess={() => {
+            onSuccess();
+            setOpen(false);
+          }}
+        />
 
       </DialogContent>
     </Dialog>

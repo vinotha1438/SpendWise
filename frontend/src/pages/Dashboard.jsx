@@ -1,3 +1,4 @@
+import { useData } from "../context/DataContext";
 import { useEffect, useState } from "react";
 import API from "../services/api";
 
@@ -10,59 +11,55 @@ import ExpenseChart from "../components/dashboard/ExpenseChart";
 import ExpensePieChart from "../components/dashboard/ExpensePieChart";
 import ExpenseForm from "../components/transaction/ExpenseForm";
 import SpendingInsights from "../components/dashboard/SpendingInsights";
-import DailyAnalytics from "@/components/dashboard/DailyAnalytics";
-import WeeklyTrendChart from "@/components/dashboard/WeeklyTrendChart";
+import DailyAnalytics from "../components/dashboard/DailyAnalytics";
+import WeeklyTrendChart from "../components/dashboard/WeeklyTrendChart";
 import BudgetProgress from "../components/dashboard/BudgetProgress";
-import ExportPDF from "../components/reports/ExportPDF";
-import ExportExcel from "../components/reports/ExportExcel";
+import AddIncomeModal from "../components/transaction/AddIncomeModal";
+import UpcomingPayments from "../components/recurring/UpcomingPayments";
 
 function Dashboard() {
-  const [expenses, setExpenses] = useState([]);
-  const [income, setIncome] = useState([]);
-
+  const {
+    expenses,
+    income,
+    refreshData,
+  } = useData();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
   const [editingExpense, setEditingExpense] = useState(null);
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [dateFilter, setDateFilter] = useState("All");
-  console.log("Dashboard Render:", showExpenseForm);
+  const [showIncomeForm, setShowIncomeForm] = useState(false);
+  const [editingIncome, setEditingIncome] = useState(null);
+  const [recurringExpenses, setRecurringExpenses] =
+    useState([]);
 
-  const fetchExpenses = async () => {
+  const fetchRecurringExpenses = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await API.get("/expenses", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await API.get(
+        "/recurring-expenses",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      setExpenses(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      alert(error.response?.data?.message || error.message);
-    }
-  };
-
-  const fetchIncome = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await API.get("/income", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setIncome(Array.isArray(response.data) ? response.data : []);
+      setRecurringExpenses(
+        Array.isArray(response.data)
+          ? response.data
+          : []
+      );
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    fetchExpenses();
-    fetchIncome();
+    refreshData();
+    fetchRecurringExpenses();
   }, []);
 
   const deleteExpense = async (id) => {
@@ -75,7 +72,7 @@ function Dashboard() {
         },
       });
 
-      fetchExpenses();
+      refreshData();
     } catch (error) {
       alert(error.response?.data?.message || "Delete Failed");
     }
@@ -91,14 +88,14 @@ function Dashboard() {
         },
       });
 
-      fetchIncome();
+      refreshData();
     } catch (error) {
       alert(error.response?.data?.message || "Delete Failed");
     }
   };
 
   const editExpense = (expense) => {
-    alert("Inside editExpense");
+    console.log("Editing Expense:", expense);
     console.log(expense);
 
     setEditingExpense(expense);
@@ -106,8 +103,10 @@ function Dashboard() {
   };
 
   const editIncome = (item) => {
-    alert("Income Edit - Next Step");
-    console.log(item);
+    console.log("Editing Income:", item);
+
+    setEditingIncome(item);
+    setShowIncomeForm(true);
   };
 
   const today = new Date();
@@ -169,35 +168,15 @@ function Dashboard() {
   return (
     <>
       {showExpenseForm && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 9999,
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              padding: "20px",
-              borderRadius: "10px",
-              width: "500px",
-            }}
-          >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
             <ExpenseForm
               expense={editingExpense}
               isEdit={true}
               onSuccess={() => {
                 setShowExpenseForm(false);
                 setEditingExpense(null);
-                fetchExpenses();
+                refreshData();
               }}
             />
 
@@ -206,12 +185,7 @@ function Dashboard() {
                 setShowExpenseForm(false);
                 setEditingExpense(null);
               }}
-              style={{
-                marginTop: "10px",
-                width: "100%",
-                padding: "10px",
-                cursor: "pointer",
-              }}
+              className="mt-4 w-full rounded-xl bg-slate-200 py-3 font-medium hover:bg-slate-300 transition"
             >
               Close
             </button>
@@ -219,18 +193,31 @@ function Dashboard() {
         </div>
       )}
 
-      <AppLayout>
+      {showIncomeForm && (
+        <AddIncomeModal
+          open={showIncomeForm}
+          setOpen={setShowIncomeForm}
+          incomeToEdit={editingIncome}
+          onSuccess={() => {
+            refreshData();
+            setEditingIncome(null);
+            setShowIncomeForm(false);
+          }}
+        />
+      )}
+
+      <AppLayout
+        expenses={expenses}
+        income={income}
+      >
+
         <DashboardHeader />
 
-        <div style={{ marginBottom: "20px" }}>
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            style={{
-              padding: "10px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-            }}
+            className="w-full sm:w-60 rounded-xl border border-slate-300 bg-white px-4 py-2 shadow-sm focus:border-emerald-500 focus:outline-none"
           >
             <option>All</option>
             <option>Today</option>
@@ -253,6 +240,10 @@ function Dashboard() {
 
         <BudgetProgress expenses={expenses} />
 
+        <UpcomingPayments
+          recurringExpenses={recurringExpenses}
+        />
+
         <ExpenseSection
           expenses={filteredExpenses}
           search={search}
@@ -269,9 +260,10 @@ function Dashboard() {
           onEdit={editIncome}
         />
 
-        <ExpenseChart expenses={expenses} />
-
-        <ExpensePieChart expenses={expenses} />
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ExpenseChart expenses={expenses} />
+          <ExpensePieChart expenses={expenses} />
+        </div>
       </AppLayout>
     </>
   );

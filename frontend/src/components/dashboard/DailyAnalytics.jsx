@@ -1,53 +1,47 @@
-function DailyAnalytics({ expenses }) {
+function DailyAnalytics({ expenses = [] }) {
   const today = new Date();
 
-  const todayString = today.toDateString();
+  const isSameDay = (d1, d2) =>
+    d1.getDate() === d2.getDate() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getFullYear() === d2.getFullYear();
 
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
 
-  const yesterdayString = yesterday.toDateString();
-
   const todayExpense = expenses
-    .filter(
-      (item) =>
-        new Date(item.date).toDateString() === todayString
-    )
-    .reduce((sum, item) => sum + Number(item.amount), 0);
+    .filter((e) => isSameDay(new Date(e.expense_date), today))
+    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
   const yesterdayExpense = expenses
-    .filter(
-      (item) =>
-        new Date(item.date).toDateString() ===
-        yesterdayString
-    )
-    .reduce((sum, item) => sum + Number(item.amount), 0);
+    .filter((e) => isSameDay(new Date(e.expense_date), yesterday))
+    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
-  const last7Days = expenses
-    .filter((item) => {
+  const last7DaysExpense = expenses
+    .filter((e) => {
+      const date = new Date(e.expense_date);
       const diff =
-        (today - new Date(item.date)) /
-        (1000 * 60 * 60 * 24);
+        (today - date) / (1000 * 60 * 60 * 24);
 
-      return diff <= 7;
+      return diff >= 0 && diff <= 7;
     })
-    .reduce((sum, item) => sum + Number(item.amount), 0);
+    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
-  const thisMonth = expenses
-    .filter((item) => {
-      const d = new Date(item.date);
+  const thisMonthExpense = expenses
+    .filter((e) => {
+      const date = new Date(e.expense_date);
 
       return (
-        d.getMonth() === today.getMonth() &&
-        d.getFullYear() === today.getFullYear()
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear()
       );
     })
-    .reduce((sum, item) => sum + Number(item.amount), 0);
+    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
-  const avg =
-    last7Days === 0
-      ? 0
-      : Math.round(last7Days / 7);
+  const averagePerDay =
+    expenses.length > 0
+      ? Math.round(thisMonthExpense / new Date().getDate())
+      : 0;
 
   const cards = [
     {
@@ -58,70 +52,42 @@ function DailyAnalytics({ expenses }) {
     {
       title: "Yesterday",
       value: yesterdayExpense,
-      icon: "📆",
+      icon: "🗓️",
     },
     {
       title: "Last 7 Days",
-      value: last7Days,
+      value: last7DaysExpense,
       icon: "📊",
     },
     {
       title: "This Month",
-      value: thisMonth,
+      value: thisMonthExpense,
       icon: "📈",
     },
     {
       title: "Average / Day",
-      value: avg,
+      value: averagePerDay,
       icon: "💸",
     },
   ];
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns:
-          "repeat(auto-fit,minmax(220px,1fr))",
-        gap: "20px",
-        marginBottom: "30px",
-      }}
-    >
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 mb-8">
       {cards.map((card) => (
         <div
           key={card.title}
-          style={{
-            background: "white",
-            borderRadius: "15px",
-            padding: "20px",
-            boxShadow:
-              "0 5px 15px rgba(0,0,0,.08)",
-          }}
+          className="bg-white rounded-2xl shadow-md p-5"
         >
-          <div
-            style={{
-              fontSize: "28px",
-            }}
-          >
+          <div className="text-2xl">
             {card.icon}
           </div>
 
-          <p
-            style={{
-              color: "#64748B",
-              marginTop: "10px",
-            }}
-          >
+          <p className="text-slate-500 mt-2">
             {card.title}
           </p>
 
-          <h2
-            style={{
-              marginTop: "8px",
-              color: "#0F172A",
-            }}
-          >
-            ₹{card.value.toLocaleString()}
+          <h2 className="text-3xl font-bold mt-2">
+            ₹{card.value.toLocaleString("en-IN")}
           </h2>
         </div>
       ))}

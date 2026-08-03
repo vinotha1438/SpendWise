@@ -14,56 +14,92 @@ function MonthlyTrendChart({ expenses = [] }) {
   expenses.forEach((item) => {
     if (!item.expense_date) return;
 
-    const month = new Date(item.expense_date).toLocaleString("default", {
-      month: "short",
-    });
+    const date = new Date(item.expense_date);
 
-    monthlyData[month] =
-      (monthlyData[month] || 0) + Number(item.amount);
+    const monthKey = `${date.getFullYear()}-${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}`;
+
+    if (!monthlyData[monthKey]) {
+      monthlyData[monthKey] = {
+        month: date.toLocaleString("default", {
+          month: "short",
+        }),
+        amount: 0,
+      };
+    }
+
+    monthlyData[monthKey].amount += Number(
+      item.amount || 0
+    );
   });
 
-  const data = Object.keys(monthlyData).map((month) => ({
-    month,
-    amount: monthlyData[month],
-  }));
+  const data = Object.keys(monthlyData)
+    .sort()
+    .map((key) => monthlyData[key]);
 
   return (
-    <div
-      style={{
-        background: "#111827",
-        borderRadius: "16px",
-        padding: "20px",
-        marginTop: "25px",
-        border: "1px solid #374151",
-      }}
-    >
-      <h2
-        style={{
-          color: "white",
-          marginBottom: "20px",
-        }}
-      >
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+      <h2 className="mb-6 text-xl font-bold text-slate-800">
         📈 Monthly Expense Trend
       </h2>
 
-      <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+      {data.length === 0 ? (
+        <div className="flex h-[350px] items-center justify-center text-slate-500">
+          No expense data available.
+        </div>
+      ) : (
+        <>
+          <ResponsiveContainer
+            width="100%"
+            height={350}
+          >
+            <LineChart data={data}>
 
-          <XAxis dataKey="month" stroke="#CBD5E1" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+              />
 
-          <YAxis stroke="#CBD5E1" />
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 13 }}
+              />
 
-          <Tooltip />
+              <YAxis
+                tickFormatter={(value) =>
+                  `₹${value.toLocaleString("en-IN")}`
+                }
+              />
 
-          <Line
-            type="monotone"
-            dataKey="amount"
-            stroke="#3B82F6"
-            strokeWidth={3}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+              <Tooltip
+                formatter={(value) => [
+                  `₹${Number(value).toLocaleString(
+                    "en-IN"
+                  )}`,
+                  "Expense",
+                ]}
+              />
+
+              <Line
+                type="monotone"
+                dataKey="amount"
+                stroke="#3B82F6"
+                strokeWidth={3}
+                dot={{ r: 5 }}
+                activeDot={{ r: 7 }}
+              />
+
+            </LineChart>
+          </ResponsiveContainer>
+
+          <p className="mt-4 text-center text-sm text-slate-500">
+            Monthly spending trend based on recorded expenses.
+          </p>
+        </>
+      )}
+
     </div>
   );
 }

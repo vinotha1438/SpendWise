@@ -2,12 +2,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Income from "./pages/Income";
 import BudgetPlanner from "./pages/BudgetPlanner";
-import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
+import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Goals from "./pages/Goals";
+import RecurringExpenses from "./pages/RecurringExpenses";
 
 function App() {
   return (
@@ -17,9 +20,20 @@ function App() {
 
         <Route path="/login" element={<Login />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
-        <Route path="/income" element={<Income />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+        <Route
+          path="/income"
+          element={<Income />}
+        />
 
         <Route
           path="/budget"
@@ -35,33 +49,26 @@ function App() {
           path="/reports"
           element={<Reports />}
         />
+
+        <Route
+          path="/settings"
+          element={<Settings />}
+        />
+
+        <Route
+          path="/goals"
+          element={<Goals />}
+        />
+
+        <Route
+          path="/recurring-expenses"
+          element={<RecurringExpenses />}
+        />
       </Routes>
 
       <Toaster
         position="top-right"
         reverseOrder={false}
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: "#111827",
-            color: "#ffffff",
-            border: "1px solid #374151",
-            borderRadius: "10px",
-            fontSize: "14px",
-          },
-          success: {
-            iconTheme: {
-              primary: "#22C55E",
-              secondary: "#ffffff",
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: "#EF4444",
-              secondary: "#ffffff",
-            },
-          },
-        }}
       />
     </BrowserRouter>
   );

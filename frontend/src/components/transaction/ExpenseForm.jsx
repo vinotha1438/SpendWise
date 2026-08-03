@@ -22,64 +22,74 @@ function ExpenseForm({
   const [notes, setNotes] = useState(expense?.notes || "");
 
   const handleSubmit = async () => {
-    try {
-      const token = localStorage.getItem("token");
+  if (
+    !title ||
+    !amount ||
+    !category ||
+    !paymentMethod ||
+    !expenseDate
+  ) {
+    alert("Please fill all required fields");
+    return;
+  }
 
-      let response;
+  try {
+    const token = localStorage.getItem("token");
 
-      const data = {
-        title,
-        amount,
-        category,
-        payment_method: paymentMethod,
-        expense_date: expenseDate,
-        notes,
-      };
+    const data = {
+      title,
+      amount: Number(amount),
+      category,
+      payment_method: paymentMethod,
+      expense_date: expenseDate,
+      notes,
+    };
 
-      if (isEdit) {
-        response = await API.put(
-          `/expenses/${expense.id}`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      } else {
-        response = await API.post(
-          "/expenses",
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      }
+    let response;
 
-      alert(response.data.message);
-
-      if (!isEdit) {
-        setTitle("");
-        setAmount("");
-        setCategory("");
-        setPaymentMethod("");
-        setExpenseDate("");
-        setNotes("");
-      }
-
-      onSuccess();
-
-    } catch (error) {
-      console.log(error);
-
-      alert(
-        error.response?.data?.message ||
-        "Failed to save expense"
+    if (isEdit) {
+      response = await API.put(
+        `/expenses/${expense.id}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } else {
+      response = await API.post(
+        "/expenses",
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
     }
-  };
+
+    alert(response.data.message);
+
+    if (!isEdit) {
+      setTitle("");
+      setAmount("");
+      setCategory("");
+      setPaymentMethod("");
+      setExpenseDate("");
+      setNotes("");
+    }
+
+    onSuccess();
+  } catch (error) {
+    console.log(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Failed to save expense"
+    );
+  }
+};
 
   return (
     <div className="mt-4 space-y-3">

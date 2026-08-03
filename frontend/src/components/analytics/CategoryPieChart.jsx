@@ -24,55 +24,83 @@ function CategoryPieChart({ expenses = [] }) {
     const category = item.category || "Others";
 
     categoryData[category] =
-      (categoryData[category] || 0) + Number(item.amount);
+      (categoryData[category] || 0) +
+      Number(item.amount || 0);
   });
 
-  const data = Object.keys(categoryData).map((key) => ({
-    name: key,
-    value: categoryData[key],
-  }));
+  const data = Object.entries(categoryData).map(
+    ([name, value]) => ({
+      name,
+      value,
+    })
+  );
+
+  const totalExpense = data.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
 
   return (
-    <div
-      style={{
-        background: "#111827",
-        borderRadius: "16px",
-        padding: "20px",
-        border: "1px solid #374151",
-        marginTop: "25px",
-      }}
-    >
-      <h2
-        style={{
-          color: "white",
-          marginBottom: "20px",
-        }}
-      >
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+      <h2 className="mb-6 text-xl font-bold text-slate-800">
         🥧 Expense by Category
       </h2>
 
-      <ResponsiveContainer width="100%" height={350}>
-        <PieChart>
-          <Pie
-            data={data}
-            dataKey="value"
-            nameKey="name"
-            outerRadius={120}
-            label
-          >
-            {data.map((entry, index) => (
-              <Cell
-                key={index}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
+      {data.length === 0 ? (
+        <div className="flex h-[350px] items-center justify-center text-slate-500">
+          No expense data available.
+        </div>
+      ) : (
+        <ResponsiveContainer
+          width="100%"
+          height={350}
+        >
+          <PieChart>
 
-          <Tooltip />
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              outerRadius={110}
+              label={({ percent }) =>
+                `${(percent * 100).toFixed(0)}%`
+              }
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={entry.name}
+                  fill={
+                    COLORS[index % COLORS.length]
+                  }
+                />
+              ))}
+            </Pie>
 
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+            <Tooltip
+              formatter={(value) => [
+                `₹${Number(value).toLocaleString(
+                  "en-IN"
+                )}`,
+                "Amount",
+              ]}
+            />
+
+            <Legend verticalAlign="bottom" />
+
+          </PieChart>
+        </ResponsiveContainer>
+      )}
+
+      {data.length > 0 && (
+        <p className="mt-4 text-center text-sm text-slate-500">
+          Total Expense:{" "}
+          <span className="font-semibold text-slate-700">
+            ₹{totalExpense.toLocaleString("en-IN")}
+          </span>
+        </p>
+      )}
+
     </div>
   );
 }

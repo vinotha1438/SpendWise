@@ -1,55 +1,54 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-function ExportPDF({ expenses }) {
-  const generatePDF = () => {
+function ExportPDF({ expenses = [], income = [] }) {
+  const exportPDF = () => {
     const doc = new jsPDF();
 
-    doc.setFontSize(20);
-    doc.text("SpendWise Expense Report", 14, 20);
+    doc.setFontSize(18);
+    doc.text("SpendWise Financial Report", 14, 20);
 
-    const tableData = expenses.map((expense) => [
-      expense.title,
-      expense.category,
-      expense.payment_method,
-      `₹${expense.amount}`,
-      expense.expense_date
-        ? new Date(expense.expense_date).toLocaleDateString()
-        : "-",
-    ]);
-
-    autoTable(doc, {
-      startY: 30,
-      head: [["Title", "Category", "Payment", "Amount", "Date"]],
-      body: tableData,
-    });
-
-    const total = expenses.reduce(
+    const totalIncome = income.reduce(
       (sum, item) => sum + Number(item.amount),
       0
     );
 
-    doc.text(
-      `Total Expense: ₹${total.toLocaleString()}`,
-      14,
-      doc.lastAutoTable.finalY + 15
+    const totalExpense = expenses.reduce(
+      (sum, item) => sum + Number(item.amount),
+      0
     );
 
-    doc.save("SpendWise_Expense_Report.pdf");
+    doc.setFontSize(11);
+
+    doc.text(`Total Income : ₹${totalIncome.toLocaleString("en-IN")}`, 14, 35);
+    doc.text(`Total Expense : ₹${totalExpense.toLocaleString("en-IN")}`, 14, 43);
+    doc.text(
+      `Net Balance : ₹${(totalIncome - totalExpense).toLocaleString("en-IN")}`,
+      14,
+      51
+    );
+
+    autoTable(doc, {
+      startY: 60,
+      head: [["Title", "Category", "Amount", "Payment", "Date"]],
+      body: expenses.map((item) => [
+        item.title,
+        item.category,
+        `₹${Number(item.amount).toLocaleString("en-IN")}`,
+        item.payment_method,
+        item.expense_date
+          ? new Date(item.expense_date).toLocaleDateString("en-IN")
+          : "-",
+      ]),
+    });
+
+    doc.save("SpendWise_Report.pdf");
   };
 
   return (
     <button
-      onClick={generatePDF}
-      style={{
-        background: "#2563EB",
-        color: "white",
-        padding: "10px 20px",
-        border: "none",
-        borderRadius: "8px",
-        cursor: "pointer",
-        marginBottom: "20px",
-      }}
+      onClick={exportPDF}
+      className="rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700 transition"
     >
       📄 Export PDF
     </button>

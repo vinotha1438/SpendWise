@@ -1,0 +1,20 @@
+{
+  "dashboard": "Dashboard",
+  "income": "Income",
+  "expense": "Expense",
+  "budgetPlanner": "Budget Planner",
+  "goals": "Goals",
+  "analytics": "Analytics",
+  "reports": "Reports",
+  "settings": "Settings",
+  "logout": "Logout",
+  "currentBalance": "Current Balance",
+  "liveBalance": "Live Balance",
+  "personalFinance": "Personal Finance",
+  "search": "Search",
+  "allCategories": "All Categories",
+  "expenseHistory": "Expense History",
+  "incomeHistory": "Income History",
+  "notifications": "Notifications",
+  "language": "Language"
+}

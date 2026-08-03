@@ -1,5 +1,6 @@
 import { useState } from "react";
 import API from "../../services/api";
+import toast from "react-hot-toast";
 
 function IncomeForm({
   incomeToEdit = null,
@@ -13,30 +14,47 @@ function IncomeForm({
   const [paymentMethod, setPaymentMethod] = useState(
     incomeToEdit?.payment_method || ""
   );
+
   const [incomeDate, setIncomeDate] = useState(
     incomeToEdit?.income_date
       ? incomeToEdit.income_date.substring(0, 10)
       : ""
   );
-  const [notes, setNotes] = useState(incomeToEdit?.notes || "");
+
+  const [notes, setNotes] = useState(
+    incomeToEdit?.notes || ""
+  );
 
   const handleSubmit = async () => {
+    if (
+      !title ||
+      !amount ||
+      !category ||
+      !paymentMethod ||
+      !incomeDate
+    ) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
+
+      const data = {
+        title,
+        amount: Number(amount),
+        category,
+        payment_method: paymentMethod,
+        income_date: incomeDate,
+        notes,
+      };
 
       let response;
 
       if (isEdit) {
         response = await API.put(
           `/income/${incomeToEdit.id}`,
-          {
-            title,
-            amount,
-            category,
-            payment_method: paymentMethod,
-            income_date: incomeDate,
-            notes,
-          },
+          data,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -46,14 +64,7 @@ function IncomeForm({
       } else {
         response = await API.post(
           "/income",
-          {
-            title,
-            amount,
-            category,
-            payment_method: paymentMethod,
-            income_date: incomeDate,
-            notes,
-          },
+          data,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -62,9 +73,9 @@ function IncomeForm({
         );
       }
 
-      alert(response.data.message);
-
-      onSuccess();
+      toast.success(
+        response.data.message || "Income Saved Successfully"
+      );
 
       if (!isEdit) {
         setTitle("");
@@ -74,10 +85,13 @@ function IncomeForm({
         setIncomeDate("");
         setNotes("");
       }
+
+      onSuccess();
+
     } catch (error) {
       console.log(error);
 
-      alert(
+      toast.error(
         error.response?.data?.message ||
         "Failed to save income"
       );
@@ -90,7 +104,7 @@ function IncomeForm({
       <input
         type="text"
         placeholder="Income Title"
-        className="w-full border rounded-lg p-2"
+        className="w-full rounded-lg border p-2"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
@@ -98,27 +112,27 @@ function IncomeForm({
       <input
         type="number"
         placeholder="Amount"
-        className="w-full border rounded-lg p-2"
+        className="w-full rounded-lg border p-2"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
       />
 
       <select
-        className="w-full border rounded-lg p-2"
+        className="w-full rounded-lg border p-2"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
       >
         <option value="">Select Category</option>
         <option value="Salary">💵 Salary</option>
-        <option value="Business">Business</option>
-        <option value="Freelance">Freelance</option>
-        <option value="Investment">Investment</option>
-        <option value="Gift">Gift</option>
+        <option value="Business">🏢 Business</option>
+        <option value="Freelance">💻 Freelance</option>
+        <option value="Investment">📈 Investment</option>
+        <option value="Gift">🎁 Gift</option>
         <option value="Other">📦 Other</option>
       </select>
 
       <select
-        className="w-full border rounded-lg p-2"
+        className="w-full rounded-lg border p-2"
         value={paymentMethod}
         onChange={(e) => setPaymentMethod(e.target.value)}
       >
@@ -130,21 +144,21 @@ function IncomeForm({
 
       <input
         type="date"
-        className="w-full border rounded-lg p-2"
+        className="w-full rounded-lg border p-2"
         value={incomeDate}
         onChange={(e) => setIncomeDate(e.target.value)}
       />
 
       <textarea
-        placeholder="Notes"
-        className="w-full border rounded-lg p-2"
+        placeholder="Notes (Optional)"
+        className="w-full rounded-lg border p-2"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
       />
 
       <button
         onClick={handleSubmit}
-        className="w-full bg-green-600 text-white rounded-lg p-2 hover:bg-green-700"
+        className="w-full rounded-lg bg-green-600 p-2 text-white hover:bg-green-700 transition"
       >
         {isEdit ? "Update Income" : "Save Income"}
       </button>

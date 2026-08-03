@@ -1,141 +1,147 @@
-function IncomeTable({ income = [], onEdit, onDelete }) {
+import { Pencil, Trash2 } from "lucide-react";
+
+function IncomeTable({
+  income = [],
+  onEdit,
+  onDelete,
+}) {
   if (income.length === 0) {
     return (
-      <div
-        style={{
-          marginTop: "30px",
-          background: "#111827",
-          padding: "20px",
-          borderRadius: "15px",
-          border: "1px solid #1F2937",
-          color: "white",
-          textAlign: "center",
-        }}
-      >
-        No Income Found
+      <div className="py-16 text-center">
+        <h3 className="text-xl font-semibold text-slate-700">
+          No Income Found
+        </h3>
+
+        <p className="mt-2 text-slate-500">
+          Add your first income to get started.
+        </p>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        marginTop: "30px",
-        background: "#111827",
-        padding: "20px",
-        borderRadius: "15px",
-        border: "1px solid #1F2937",
-        overflowX: "auto",
-      }}
-    >
-      <h2
-        style={{
-          color: "white",
-          fontSize: "24px",
-          marginBottom: "20px",
-        }}
-      >
-        💰 Income History
-      </h2>
+    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          color: "white",
-        }}
-      >
-        <thead>
+      <table className="min-w-[900px] w-full border-collapse">
+
+        <thead className="bg-slate-100">
+
           <tr>
-            <th style={thStyle}>Title</th>
-            <th style={thStyle}>Category</th>
-            <th style={thStyle}>Payment</th>
-            <th style={thStyle}>Amount</th>
-            <th style={thStyle}>Date</th>
-            <th style={thStyle}>Actions</th>
+
+            <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">
+              Title
+            </th>
+
+            <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">
+              Category
+            </th>
+
+            <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">
+              Payment
+            </th>
+
+            <th className="px-5 py-4 text-right text-sm font-semibold text-slate-700 whitespace-nowrap">
+              Amount
+            </th>
+
+            <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">
+              Date
+            </th>
+
+            <th className="px-5 py-4 text-center text-sm font-semibold text-slate-700 whitespace-nowrap">
+              Actions
+            </th>
+
           </tr>
+
         </thead>
 
         <tbody>
-          {income.map((item) => (
-            <tr key={item.id}>
-              <td style={tdStyle}>{item.title}</td>
-              <td style={tdStyle}>{item.category}</td>
-              <td style={tdStyle}>{item.payment_method}</td>
 
-              <td
-                style={{
-                  ...tdStyle,
-                  color: "#22C55E",
-                  fontWeight: "bold",
-                }}
-              >
-                ₹{Number(item.amount).toLocaleString()}
+          {income.map((item) => (
+
+            <tr
+              key={item.id}
+              className="border-t border-slate-200 transition hover:bg-slate-50"
+            >
+
+              <td className="px-5 py-4 font-medium text-slate-800 whitespace-nowrap">
+                {item.title}
               </td>
 
-              <td style={tdStyle}>
+              <td className="px-5 py-4 whitespace-nowrap">
+
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                  {item.category}
+                </span>
+
+              </td>
+
+              <td className="px-5 py-4 text-slate-600 whitespace-nowrap">
+                {item.payment_method}
+              </td>
+
+              <td className="px-5 py-4 text-right font-bold text-emerald-600 whitespace-nowrap">
+                ₹
+                {Number(item.amount).toLocaleString(
+                  "en-IN"
+                )}
+              </td>
+
+              <td className="px-5 py-4 text-slate-600 whitespace-nowrap">
                 {item.income_date
-                  ? new Date(item.income_date).toLocaleDateString()
+                  ? new Date(
+                      item.income_date
+                    ).toLocaleDateString("en-IN")
                   : "-"}
               </td>
 
-              <td style={tdStyle}>
-                <button
-                  onClick={() => onEdit(item)}
-                  style={{
-                    background: "#3B82F6",
-                    color: "white",
-                    border: "none",
-                    padding: "8px 12px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    marginRight: "8px",
-                  }}
-                >
-                  ✏️ Edit
-                </button>
+              <td className="px-5 py-4">
 
-                <button
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        "Are you sure you want to delete this income?"
-                      )
-                    ) {
-                      onDelete(item.id);
-                    }
-                  }}
-                  style={{
-                    background: "#EF4444",
-                    color: "white",
-                    border: "none",
-                    padding: "8px 12px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  🗑 Delete
-                </button>
+                <div className="flex items-center justify-center gap-2">
+
+                  <button
+                    onClick={() => onEdit(item)}
+                    className="flex items-center gap-1 rounded-lg bg-blue-500 px-3 py-2 text-white transition hover:bg-blue-600"
+                  >
+                    <Pencil size={16} />
+                    <span className="hidden sm:inline">
+                      Edit
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Delete this income?"
+                        )
+                      ) {
+                        onDelete(item.id);
+                      }
+                    }}
+                    className="flex items-center gap-1 rounded-lg bg-red-500 px-3 py-2 text-white transition hover:bg-red-600"
+                  >
+                    <Trash2 size={16} />
+                    <span className="hidden sm:inline">
+                      Delete
+                    </span>
+                  </button>
+
+                </div>
+
               </td>
+
             </tr>
+
           ))}
+
         </tbody>
+
       </table>
+
     </div>
   );
 }
-
-const thStyle = {
-  textAlign: "left",
-  padding: "12px",
-  color: "#CBD5E1",
-  borderBottom: "1px solid #374151",
-};
-
-const tdStyle = {
-  padding: "12px",
-  color: "white",
-  borderBottom: "1px solid #1F2937",
-};
 
 export default IncomeTable;

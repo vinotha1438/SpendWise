@@ -10,67 +10,94 @@ function ExpenseSection({
   onEdit,
 }) {
   return (
-    <div
-      style={{
-        marginTop: "30px",
-        background: "#111827",
-        padding: "20px",
-        borderRadius: "15px",
-        border: "1px solid #1F2937",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          gap: "15px",
-          marginBottom: "20px",
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Search Expense..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "12px",
-            borderRadius: "10px",
-            border: "1px solid #374151",
-            background: "#1F2937",
-            color: "white",
-          }}
-        />
+    <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
 
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          style={{
-            padding: "12px",
-            borderRadius: "10px",
-            border: "1px solid #374151",
-            background: "#1F2937",
-            color: "white",
-          }}
-        >
-          <option value="">All Categories</option>
-          <option value="Food">Food</option>
-          <option value="Travel">Travel</option>
-          <option value="Shopping">Shopping</option>
-          <option value="Bills">Bills</option>
-          <option value="Entertainment">Entertainment</option>
-          <option value="Health">Health</option>
-          <option value="Education">Education</option>
-          <option value="Office">Office</option>
-          <option value="Home">Home</option>
-          <option value="Others">Others</option>
-        </select>
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+        <div className="min-w-0">
+          <h2 className="text-2xl font-bold text-slate-800">
+            Expense History
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            View, search and manage all your expenses.
+          </p>
+        </div>
+
+        <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+
+          <input
+            type="text"
+            placeholder="🔍 Search expense..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="
+              w-full
+              sm:w-72
+              rounded-xl
+              border
+              border-slate-300
+              px-4
+              py-3
+              outline-none
+              transition
+              focus:border-emerald-500
+              focus:ring-2
+              focus:ring-emerald-500
+            "
+          />
+
+          <select
+            value={selectedCategory}
+            onChange={(e) =>
+              setSelectedCategory(e.target.value)
+            }
+            className="
+              w-full
+              sm:w-56
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              py-3
+              outline-none
+              transition
+              focus:border-emerald-500
+              focus:ring-2
+              focus:ring-emerald-500
+            "
+          >
+            <option value="">
+              All Categories
+            </option>
+
+            <option>Food</option>
+            <option>Travel</option>
+            <option>Shopping</option>
+            <option>Bills</option>
+            <option>Entertainment</option>
+            <option>Health</option>
+            <option>Education</option>
+            <option>Office</option>
+            <option>Home</option>
+            <option>Others</option>
+          </select>
+
+        </div>
+
       </div>
 
-      <TransactionTable
-        expenses={expenses}
-        onDelete={onDelete}
-        onEdit={onEdit}
-      />
+      <div className="overflow-x-auto rounded-xl border border-slate-200">
+
+        <TransactionTable
+          expenses={expenses}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
+
+      </div>
+
     </div>
   );
 }

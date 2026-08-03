@@ -1,137 +1,68 @@
-import { useEffect, useState } from "react";
-import API from "../services/api";
+import { useData } from "../context/DataContext";
+
 import AppLayout from "../components/layout/AppLayout";
+import AnalyticsCards from "../components/analytics/AnalyticsCards";
 import IncomeExpenseChart from "../components/analytics/IncomeExpenseChart";
 import CategoryPieChart from "../components/analytics/CategoryPieChart";
 import MonthlyTrendChart from "../components/analytics/MonthlyTrendChart";
 import SmartInsights from "../components/analytics/SmartInsights";
 
 function Analytics() {
-    const [expenses, setExpenses] = useState([]);
-    const [income, setIncome] = useState([]);
+  const { expenses, income } = useData();
 
-    const fetchExpenses = async () => {
-        try {
-            const token = localStorage.getItem("token");
+  return (
+    <AppLayout
+      expenses={expenses}
+      income={income}
+    >
+      <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
-            const response = await API.get("/expenses", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+        <h1 className="text-3xl font-bold text-slate-800">
+          📊 Analytics Dashboard
+        </h1>
 
-            setExpenses(Array.isArray(response.data) ? response.data : []);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+        <p className="mt-2 text-slate-500">
+          Track your financial performance, spending patterns and monthly trends.
+        </p>
 
-    const fetchIncome = async () => {
-        try {
-            const token = localStorage.getItem("token");
+      </div>
 
-            const response = await API.get("/income", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+      <AnalyticsCards
+        expenses={expenses}
+        income={income}
+      />
 
-            setIncome(Array.isArray(response.data) ? response.data : []);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+      <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
 
-    useEffect(() => {
-        fetchExpenses();
-        fetchIncome();
-    }, []);
+        <IncomeExpenseChart
+          expenses={expenses}
+          income={income}
+        />
 
-    const totalExpense = expenses.reduce(
-        (sum, item) => sum + Number(item.amount),
-        0
-    );
+        <CategoryPieChart
+          expenses={expenses}
+        />
 
-    const totalIncome = income.reduce(
-        (sum, item) => sum + Number(item.amount),
-        0
-    );
+      </div>
 
-    const savings = totalIncome - totalExpense;
+      <div className="mt-8">
 
-    const savingsRate =
-        totalIncome === 0
-            ? 0
-            : ((savings / totalIncome) * 100).toFixed(1);
+        <MonthlyTrendChart
+          expenses={expenses}
+        />
 
-    return (
-        <AppLayout>
-            <h1
-                style={{
-                    fontSize: "32px",
-                    fontWeight: "bold",
-                    marginBottom: "30px",
-                }}
-            >
-                📊 Analytics
-            </h1>
+      </div>
 
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-                    gap: "20px",
-                }}
-            >
-                <div style={cardStyle}>
-                    <h3>💰 Total Income</h3>
-                    <h2>₹{totalIncome.toLocaleString()}</h2>
-                </div>
+      <div className="mt-8">
 
-                <div style={cardStyle}>
-                    <h3>💸 Total Expense</h3>
-                    <h2>₹{totalExpense.toLocaleString()}</h2>
-                </div>
+        <SmartInsights
+          expenses={expenses}
+        />
 
-                <div style={cardStyle}>
-                    <h3>💎 Savings</h3>
-                    <h2>₹{savings.toLocaleString()}</h2>
-                </div>
+      </div>
 
-                <div style={cardStyle}>
-                    <h3>📈 Savings Rate</h3>
-                    <h2>{savingsRate}%</h2>
-                </div>
-            </div>
-
-            {/* Income vs Expense Chart */}
-            <IncomeExpenseChart
-                income={income}
-                expenses={expenses}
-            />
-
-            <CategoryPieChart
-                expenses={expenses}
-            />
-
-            <MonthlyTrendChart
-                expenses={expenses}
-            />
-
-            <SmartInsights expenses={expenses} />
-
-        </AppLayout>
-    );
+    </AppLayout>
+  );
 }
-
-const cardStyle = {
-    background: "#111827",
-    color: "white",
-    padding: "20px",
-    borderRadius: "12px",
-    textAlign: "center",
-    border: "1px solid #374151",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-};
 
 export default Analytics;

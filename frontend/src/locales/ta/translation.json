@@ -1,0 +1,20 @@
+{
+  "dashboard": "டாஷ்போர்டு",
+  "income": "வருமானம்",
+  "expense": "செலவுகள்",
+  "budgetPlanner": "பட்ஜெட் திட்டம்",
+  "goals": "இலக்குகள்",
+  "analytics": "பகுப்பாய்வு",
+  "reports": "அறிக்கைகள்",
+  "settings": "அமைப்புகள்",
+  "logout": "வெளியேறு",
+  "currentBalance": "தற்போதைய இருப்பு",
+  "liveBalance": "நேரடி இருப்பு",
+  "personalFinance": "தனிப்பட்ட நிதி",
+  "search": "தேடு",
+  "allCategories": "அனைத்து வகைகள்",
+  "expenseHistory": "செலவு வரலாறு",
+  "incomeHistory": "வருமான வரலாறு",
+  "notifications": "அறிவிப்புகள்",
+  "language": "மொழி"
+}

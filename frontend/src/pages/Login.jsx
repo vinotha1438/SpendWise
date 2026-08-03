@@ -1,16 +1,31 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  Wallet,
+  PieChart,
+  ShieldCheck,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../services/api";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
     if (!email || !password) {
       toast.error("Please enter email and password");
       return;
@@ -24,18 +39,22 @@ function Login() {
         password,
       });
 
-      toast.success(response.data.message || "Login Successful");
+      localStorage.setItem(
+        "token",
+        response.data.token
+      );
 
-      localStorage.setItem("token", response.data.token);
+      toast.success(
+        response.data.message || "Login Successful"
+      );
 
       setTimeout(() => {
         navigate("/dashboard");
       }, 800);
     } catch (error) {
-      console.log(error);
-
       toast.error(
-        error.response?.data?.message || "Login Failed"
+        error.response?.data?.message ||
+          "Login Failed"
       );
     } finally {
       setLoading(false);
@@ -43,94 +62,228 @@ function Login() {
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#F3F4F6",
-      }}
-    >
-      <div
-        style={{
-          width: "380px",
-          background: "#FFFFFF",
-          padding: "35px",
-          borderRadius: "15px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            marginBottom: "10px",
-            color: "#111827",
-          }}
-        >
+    <div className="min-h-screen grid lg:grid-cols-2">
+
+      {/* LEFT */}
+
+      <div className="hidden lg:flex bg-slate-900 text-white p-16 flex-col justify-center">
+
+        <h1 className="text-5xl font-bold">
           💰 SpendWise
         </h1>
 
-        <p
-          style={{
-            textAlign: "center",
-            color: "#6B7280",
-            marginBottom: "30px",
-          }}
-        >
-          Welcome Back 👋
+        <p className="mt-5 text-slate-300 text-lg leading-8">
+          Welcome back.
+          Manage your expenses,
+          income,
+          savings,
+          budgets,
+          analytics and reports
+          in one powerful dashboard.
         </p>
 
-        <input
-          type="email"
-          placeholder="Enter Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "12px",
-            marginBottom: "15px",
-            borderRadius: "8px",
-            border: "1px solid #D1D5DB",
-            outline: "none",
-            boxSizing: "border-box",
-          }}
-        />
+        <div className="space-y-6 mt-14">
 
-        <input
-          type="password"
-          placeholder="Enter Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "12px",
-            marginBottom: "20px",
-            borderRadius: "8px",
-            border: "1px solid #D1D5DB",
-            outline: "none",
-            boxSizing: "border-box",
-          }}
-        />
+          <div className="flex items-center gap-5 bg-slate-800 rounded-2xl p-5">
 
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: "12px",
-            background: loading ? "#9CA3AF" : "#22C55E",
-            color: "#FFFFFF",
-            border: "none",
-            borderRadius: "8px",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontSize: "16px",
-            fontWeight: "bold",
-          }}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
+            <Wallet
+              className="text-emerald-400"
+              size={34}
+            />
+
+            <div>
+
+              <h3 className="font-semibold">
+                Expense Tracking
+              </h3>
+
+              <p className="text-slate-400">
+                Track every expense.
+              </p>
+
+            </div>
+
+          </div>
+
+          <div className="flex items-center gap-5 bg-slate-800 rounded-2xl p-5">
+
+            <PieChart
+              className="text-sky-400"
+              size={34}
+            />
+
+            <div>
+
+              <h3 className="font-semibold">
+                Smart Analytics
+              </h3>
+
+              <p className="text-slate-400">
+                Beautiful charts.
+              </p>
+
+            </div>
+
+          </div>
+
+          <div className="flex items-center gap-5 bg-slate-800 rounded-2xl p-5">
+
+            <ShieldCheck
+              className="text-yellow-400"
+              size={34}
+            />
+
+            <div>
+
+              <h3 className="font-semibold">
+                Secure Login
+              </h3>
+
+              <p className="text-slate-400">
+                JWT Authentication.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
+
+      {/* RIGHT */}
+
+      <div className="bg-slate-100 flex justify-center items-center p-8">
+
+        <div className="bg-white w-full max-w-md rounded-3xl shadow-xl p-8">
+
+          <div className="text-center mb-8">
+
+            <h2 className="text-4xl font-bold text-slate-800">
+              Welcome Back 👋
+            </h2>
+
+            <p className="text-slate-500 mt-2">
+              Login to your account
+            </p>
+
+          </div>
+
+          <form
+            onSubmit={handleLogin}
+            className="space-y-5"
+          >
+
+            {/* EMAIL */}
+
+            <div className="relative">
+
+              <Mail
+                className="absolute left-4 top-4 text-slate-400"
+                size={20}
+              />
+
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none"
+              />
+
+            </div>
+
+            {/* PASSWORD */}
+
+            <div className="relative">
+
+              <Lock
+                className="absolute left-4 top-4 text-slate-400"
+                size={20}
+              />
+
+              <input
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
+                placeholder="Password"
+                value={password}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
+                className="w-full pl-12 pr-12 py-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none"
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPassword(
+                    !showPassword
+                  )
+                }
+                className="absolute right-4 top-4"
+              >
+                {showPassword ? (
+                  <EyeOff size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </button>
+
+            </div>
+
+            <div className="flex justify-between text-sm">
+
+              <label className="flex items-center gap-2">
+
+                <input type="checkbox" />
+
+                Remember Me
+
+              </label>
+
+              <button
+                type="button"
+                className="text-emerald-600"
+              >
+                Forgot Password?
+              </button>
+
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-semibold transition"
+            >
+              {loading
+                ? "Logging in..."
+                : "Login"}
+            </button>
+
+            <p className="text-center text-slate-500">
+
+              New User?
+
+              <Link
+                to="/register"
+                className="text-emerald-600 font-semibold ml-2"
+              >
+                Create Account
+              </Link>
+
+            </p>
+
+          </form>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }

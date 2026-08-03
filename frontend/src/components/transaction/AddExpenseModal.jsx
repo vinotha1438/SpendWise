@@ -1,162 +1,132 @@
+import { useState } from "react";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-
-import { useState, useEffect } from "react";
+} from "../ui/dialog";
 
 import ExpenseForm from "./ExpenseForm";
 import IncomeForm from "./IncomeForm";
 
 function AddExpenseModal({
-  expenseToEdit = null,
-  incomeToEdit = null,
-  openExpense = false,
-  openIncome = false,
-  onExpenseClose,
-  onIncomeClose,
+  expense = null,
+  isEdit = false,
+  open: externalOpen,
+  setOpen: setExternalOpen,
+  onSuccess = () => {},
 }) {
-  const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const [showExpenseModal, setShowExpenseModal] = useState(openExpense);
-  const [showIncomeModal, setShowIncomeModal] = useState(openIncome);
+  const [showExpenseModal, setShowExpenseModal] =
+    useState(false);
 
-  useEffect(() => {
-    setShowExpenseModal(openExpense);
-  }, [openExpense]);
+  const [showIncomeModal, setShowIncomeModal] =
+    useState(false);
 
-  useEffect(() => {
-    setShowIncomeModal(openIncome);
-  }, [openIncome]);
+  const modalOpen = isEdit
+    ? externalOpen
+    : showExpenseModal;
+
+  const setModalOpen = isEdit
+    ? setExternalOpen
+    : setShowExpenseModal;
 
   return (
     <>
-      {/* Add Button */}
-      {!expenseToEdit && !incomeToEdit && (
-        <div style={{ position: "relative" }}>
+      {!isEdit && (
+        <div className="relative">
           <button
-            onClick={() => setOpen(!open)}
-            className="bg-teal-500 text-white px-4 py-2 rounded-lg"
+            onClick={() =>
+              setMenuOpen(!menuOpen)
+            }
+            className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-lg font-semibold"
           >
-            + Add ▼
+            + Add
           </button>
 
-          {open && (
-            <div
-              style={{
-                position: "absolute",
-                right: 0,
-                top: "45px",
-                background: "white",
-                borderRadius: "10px",
-                boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
-                overflow: "hidden",
-                minWidth: "180px",
-                zIndex: 999,
-              }}
-            >
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border z-50">
+
               <button
+                className="w-full text-left px-4 py-3 hover:bg-slate-100"
                 onClick={() => {
                   setShowExpenseModal(true);
-                  setOpen(false);
-                }}
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  background: "white",
-                  cursor: "pointer",
-                  textAlign: "left",
+                  setMenuOpen(false);
                 }}
               >
                 💸 Add Expense
               </button>
 
               <button
+                className="w-full text-left px-4 py-3 hover:bg-slate-100"
                 onClick={() => {
                   setShowIncomeModal(true);
-                  setOpen(false);
-                }}
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  background: "white",
-                  cursor: "pointer",
-                  textAlign: "left",
+                  setMenuOpen(false);
                 }}
               >
                 💰 Add Income
               </button>
+
             </div>
           )}
         </div>
       )}
 
       {/* Expense Modal */}
-      <Dialog
-        open={showExpenseModal}
-        onOpenChange={(value) => {
-          setShowExpenseModal(value);
 
-          if (!value && onExpenseClose) {
-            onExpenseClose();
-          }
-        }}
+      <Dialog
+        open={modalOpen}
+        onOpenChange={setModalOpen}
       >
         <DialogContent>
+
           <DialogHeader>
             <DialogTitle>
-              {expenseToEdit ? "Edit Expense" : "Add New Expense"}
+              {isEdit
+                ? "Edit Expense"
+                : "Add Expense"}
             </DialogTitle>
           </DialogHeader>
 
           <ExpenseForm
-            expense={expenseToEdit}
-            isEdit={!!expenseToEdit}
+            expense={expense}
+            isEdit={isEdit}
             onSuccess={() => {
-              setShowExpenseModal(false);
-
-              if (onExpenseClose) {
-                onExpenseClose();
-              }
+              setModalOpen(false);
+              onSuccess();
             }}
           />
+
         </DialogContent>
       </Dialog>
 
       {/* Income Modal */}
-      <Dialog
-        open={showIncomeModal}
-        onOpenChange={(value) => {
-          setShowIncomeModal(value);
 
-          if (!value && onIncomeClose) {
-            onIncomeClose();
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {incomeToEdit ? "Edit Income" : "Add New Income"}
-            </DialogTitle>
-          </DialogHeader>
+      {!isEdit && (
+        <Dialog
+          open={showIncomeModal}
+          onOpenChange={setShowIncomeModal}
+        >
+          <DialogContent>
 
-          <IncomeForm
-            incomeToEdit={incomeToEdit}
-            onSuccess={() => {
-              setShowIncomeModal(false);
+            <DialogHeader>
+              <DialogTitle>
+                Add Income
+              </DialogTitle>
+            </DialogHeader>
 
-              if (onIncomeClose) {
-                onIncomeClose();
-              }
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+            <IncomeForm
+              onSuccess={() => {
+                setShowIncomeModal(false);
+                onSuccess();
+              }}
+            />
+
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }

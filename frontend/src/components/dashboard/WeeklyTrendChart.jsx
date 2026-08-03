@@ -8,7 +8,7 @@ import {
   CartesianGrid,
 } from "recharts";
 
-function WeeklyTrendChart({ expenses }) {
+function WeeklyTrendChart({ expenses = [] }) {
   const today = new Date();
 
   const data = [];
@@ -20,16 +20,17 @@ function WeeklyTrendChart({ expenses }) {
     const total = expenses
       .filter(
         (item) =>
-          new Date(item.date).toDateString() ===
-          day.toDateString()
+          item.expense_date &&
+          new Date(item.expense_date).toDateString() ===
+            day.toDateString()
       )
       .reduce(
-        (sum, item) => sum + Number(item.amount),
+        (sum, item) => sum + Number(item.amount || 0),
         0
       );
 
     data.push({
-      day: day.toLocaleDateString("en-US", {
+      day: day.toLocaleDateString("en-IN", {
         weekday: "short",
       }),
       amount: total,
@@ -37,45 +38,42 @@ function WeeklyTrendChart({ expenses }) {
   }
 
   return (
-    <div
-      style={{
-        background: "white",
-        padding: "20px",
-        borderRadius: "15px",
-        marginBottom: "25px",
-        boxShadow: "0 5px 15px rgba(0,0,0,.08)",
-      }}
-    >
-      <h3
-        style={{
-          marginBottom: "20px",
-          color: "#0F172A",
-        }}
-      >
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
+
+      <h2 className="mb-5 text-xl font-bold text-slate-800">
         📈 Weekly Spending Trend
-      </h3>
+      </h2>
 
-      <ResponsiveContainer
-        width="100%"
-        height={300}
-      >
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
+      <div className="h-72 w-full">
 
-          <XAxis dataKey="day" />
+        <ResponsiveContainer width="100%" height="100%">
 
-          <YAxis />
+          <LineChart data={data}>
 
-          <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" />
 
-          <Line
-            type="monotone"
-            dataKey="amount"
-            stroke="#14B8A6"
-            strokeWidth={3}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+            <XAxis
+              dataKey="day"
+              tick={{ fontSize: 12 }}
+            />
+
+            <YAxis tick={{ fontSize: 12 }} />
+
+            <Tooltip />
+
+            <Line
+              type="monotone"
+              dataKey="amount"
+              stroke="#10B981"
+              strokeWidth={3}
+            />
+
+          </LineChart>
+
+        </ResponsiveContainer>
+
+      </div>
+
     </div>
   );
 }

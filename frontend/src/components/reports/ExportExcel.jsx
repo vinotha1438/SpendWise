@@ -1,65 +1,62 @@
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 
-function ExportExcel({ expenses }) {
+function ExportExcel({
+  expenses = [],
+  income = [],
+}) {
   const exportExcel = () => {
-    const data = expenses.map((expense) => ({
-      Title: expense.title,
-      Category: expense.category,
-      Payment: expense.payment_method,
-      Amount: expense.amount,
-      Date: expense.expense_date
-        ? new Date(expense.expense_date).toLocaleDateString()
+    const expenseSheet = expenses.map((item) => ({
+      Title: item.title,
+      Category: item.category,
+      Amount: Number(item.amount),
+      Payment: item.payment_method,
+      Date: item.expense_date
+        ? new Date(item.expense_date).toLocaleDateString("en-IN")
         : "-",
+      Notes: item.notes || "",
     }));
 
-    const total = expenses.reduce(
-      (sum, item) => sum + Number(item.amount),
-      0
-    );
+    const incomeSheet = income.map((item) => ({
+      Title: item.title,
+      Category: item.category,
+      Amount: Number(item.amount),
+      Payment: item.payment_method,
+      Date: item.income_date
+        ? new Date(item.income_date).toLocaleDateString("en-IN")
+        : "-",
+      Notes: item.notes || "",
+    }));
 
-    data.push({
-      Title: "",
-      Category: "",
-      Payment: "Total Expense",
-      Amount: total,
-      Date: "",
-    });
+    const wb = XLSX.utils.book_new();
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
+    const expenseWS =
+      XLSX.utils.json_to_sheet(expenseSheet);
+
+    const incomeWS =
+      XLSX.utils.json_to_sheet(incomeSheet);
 
     XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
+      wb,
+      expenseWS,
       "Expenses"
     );
 
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+    XLSX.utils.book_append_sheet(
+      wb,
+      incomeWS,
+      "Income"
+    );
 
-    const file = new Blob([excelBuffer], {
-      type: "application/octet-stream",
-    });
-
-    saveAs(file, "SpendWise_Expense_Report.xlsx");
+    XLSX.writeFile(
+      wb,
+      "SpendWise_Report.xlsx"
+    );
   };
 
   return (
     <button
       onClick={exportExcel}
-      style={{
-        background: "#16A34A",
-        color: "white",
-        padding: "10px 20px",
-        border: "none",
-        borderRadius: "8px",
-        cursor: "pointer",
-        marginBottom: "20px",
-        marginLeft: "10px",
-      }}
+      className="rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700 transition"
     >
       📊 Export Excel
     </button>

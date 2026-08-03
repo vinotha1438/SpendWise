@@ -1,54 +1,92 @@
-import { Bell, Menu, Search } from "lucide-react";
+import { Bell, Menu, Search, User } from "lucide-react";
 
 function Navbar({ sidebarOpen, setSidebarOpen }) {
-  return (
-    <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 md:px-6">
+  const hour = new Date().getHours();
 
+  let greeting = "Good Evening 🌙";
+
+  if (hour < 12) greeting = "Good Morning ☀️";
+  else if (hour < 17) greeting = "Good Afternoon 🌤️";
+
+  return (
+    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
       {/* Left */}
       <div className="flex items-center gap-4">
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu */}
         <button
-          className="lg:hidden text-white"
+          className="lg:hidden text-slate-700"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
-          <Menu size={24} />
+          <Menu size={26} />
         </button>
 
         <div>
-          <h1 className="text-xl font-bold text-white">
-            SpendWise
-          </h1>
-
-          <p className="text-xs text-slate-400 hidden md:block">
-            Personal Finance Dashboard
+          <p className="text-sm text-slate-500">
+            {greeting}
           </p>
+
+          <h2 className="text-2xl font-bold text-slate-800">
+            Dashboard
+          </h2>
         </div>
+
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-5">
 
         {/* Search */}
-        <div className="hidden md:flex items-center bg-slate-800 rounded-lg px-3 py-2 w-64">
-          <Search size={18} className="text-slate-400" />
+        <div className="hidden lg:flex items-center w-64 rounded-xl bg-slate-100 px-3 py-2">
+
+          <Search
+            size={18}
+            className="text-slate-500"
+          />
 
           <input
             type="text"
-            placeholder="Search..."
-            className="bg-transparent outline-none text-white ml-2 w-full placeholder:text-slate-400"
+            placeholder="Search expenses..."
+            className="bg-transparent outline-none ml-3 w-full text-slate-700 placeholder:text-slate-400"
           />
+
         </div>
 
         {/* Notification */}
-        <button className="text-white hover:text-emerald-400 transition">
-          <Bell size={20} />
+
+        <button className="relative p-3 rounded-xl bg-slate-100 hover:bg-slate-200 transition">
+
+          <Bell
+            size={20}
+            className="text-slate-700"
+          />
+
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500"></span>
+
         </button>
 
-        {/* Avatar */}
-        <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold">
-          S
+        {/* Profile */}
+
+        <div className="flex items-center gap-3">
+
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white">
+            <User size={20} />
+          </div>
+
+          <div className="hidden md:block">
+
+            <p className="font-semibold text-slate-800">
+              Welcome
+            </p>
+
+            <p className="text-sm text-slate-500">
+              SpendWise User
+            </p>
+
+          </div>
+
         </div>
+
       </div>
 
     </header>

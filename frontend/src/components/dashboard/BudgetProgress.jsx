@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../../services/api";
 
-function BudgetProgress({ expenses }) {
+function BudgetProgress({ expenses = [] }) {
   const [budgets, setBudgets] = useState([]);
 
   useEffect(() => {
@@ -18,112 +18,111 @@ function BudgetProgress({ expenses }) {
         },
       });
 
-      setBudgets(response.data);
+      setBudgets(
+        Array.isArray(response.data) ? response.data : []
+      );
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <div
-      style={{
-        background: "white",
-        borderRadius: "15px",
-        padding: "20px",
-        marginBottom: "25px",
-        boxShadow: "0 5px 15px rgba(0,0,0,.08)",
-      }}
-    >
-      <h3 style={{ marginBottom: "20px" }}>
+    <div className="mb-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+
+      <h2 className="mb-6 text-2xl font-bold text-slate-800">
         🎯 Budget Progress
-      </h3>
+      </h2>
 
       {budgets.length === 0 ? (
-        <p>No Budgets Found</p>
+        <p className="text-slate-500">
+          No Budgets Found
+        </p>
       ) : (
-        budgets.map((budget) => {
-          const spent = expenses
-            .filter(
-              (item) =>
-                item.category === budget.category
-            )
-            .reduce(
-              (sum, item) =>
-                sum + Number(item.amount),
-              0
+        <div className="space-y-6">
+          {budgets.map((budget) => {
+            const spent = expenses
+              .filter(
+                (item) => item.category === budget.category
+              )
+              .reduce(
+                (sum, item) =>
+                  sum + Number(item.amount || 0),
+                0
+              );
+
+            const percentage = Math.min(
+              (spent / Number(budget.monthly_budget)) * 100,
+              100
             );
 
-          const percentage = Math.min(
-            (spent / budget.monthly_budget) * 100,
-            100
-          );
+            const remaining =
+              Number(budget.monthly_budget) - spent;
 
-          const remaining =
-            budget.monthly_budget - spent;
+            return (
+              <div key={budget.id}>
 
-          return (
-            <div
-              key={budget.id}
-              style={{
-                marginBottom: "20px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                }}
-              >
-                <strong>
-                  {budget.category}
-                </strong>
+                <div className="mb-2 flex items-center justify-between">
 
-                <strong>
-                  ₹{spent} / ₹
-                  {budget.monthly_budget}
-                </strong>
-              </div>
+                  <h3 className="font-semibold text-slate-800">
+                    {budget.category}
+                  </h3>
 
-              <div
-                style={{
-                  height: "10px",
-                  background: "#E5E7EB",
-                  borderRadius: "10px",
-                  overflow: "hidden",
-                  marginTop: "8px",
-                }}
-              >
-                <div
-                  style={{
-                    width: `${percentage}%`,
-                    height: "100%",
-                    background:
+                  <span className="font-semibold text-slate-700">
+                    ₹{spent.toLocaleString("en-IN")} /
+                    ₹{Number(
+                      budget.monthly_budget
+                    ).toLocaleString("en-IN")}
+                  </span>
+
+                </div>
+
+                <div className="h-3 overflow-hidden rounded-full bg-slate-200">
+
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
                       percentage >= 100
-                        ? "#EF4444"
-                        : "#22C55E",
-                  }}
-                />
-              </div>
+                        ? "bg-red-500"
+                        : percentage >= 75
+                        ? "bg-yellow-500"
+                        : "bg-emerald-500"
+                    }`}
+                    style={{
+                      width: `${percentage}%`,
+                    }}
+                  />
 
-              <small
-                style={{
-                  color:
-                    remaining < 0
-                      ? "#EF4444"
-                      : "#64748B",
-                }}
-              >
-                {remaining >= 0
-                  ? `Remaining ₹${remaining}`
-                  : `Over Budget ₹${Math.abs(
-                      remaining
-                    )}`}
-              </small>
-            </div>
-          );
-        })
+                </div>
+
+                <div className="mt-2 flex items-center justify-between text-sm">
+
+                  <span
+                    className={
+                      remaining >= 0
+                        ? "text-slate-500"
+                        : "font-medium text-red-500"
+                    }
+                  >
+                    {remaining >= 0
+                      ? `Remaining ₹${remaining.toLocaleString(
+                          "en-IN"
+                        )}`
+                      : `Over Budget ₹${Math.abs(
+                          remaining
+                        ).toLocaleString("en-IN")}`}
+                  </span>
+
+                  <span className="font-medium text-slate-600">
+                    {percentage.toFixed(0)}%
+                  </span>
+
+                </div>
+
+              </div>
+            );
+          })}
+        </div>
       )}
+
     </div>
   );
 }

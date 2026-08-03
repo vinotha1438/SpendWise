@@ -8,47 +8,53 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-function ExpenseChart({ expenses }) {
-  const chartData = expenses.map((item) => ({
-    name: item.title,
-    Amount: Number(item.amount),
-  }));
+function ExpenseChart({ expenses = [] }) {
+  const chartData = expenses
+    .slice(-7)
+    .map((item) => ({
+      name:
+        item.title.length > 10
+          ? item.title.substring(0, 10) + "..."
+          : item.title,
+      Amount: Number(item.amount),
+    }));
 
   return (
-    <div
-      style={{
-        background: "#111827",
-        padding: "20px",
-        borderRadius: "15px",
-        marginTop: "30px",
-      }}
-    >
-      <h2
-        style={{
-          color: "white",
-          marginBottom: "20px",
-        }}
-      >
-        Expense Analytics
+    <div className="rounded-2xl bg-white p-6 shadow-md border border-slate-200">
+      <h2 className="mb-5 text-xl font-bold text-slate-800">
+        📊 Expense Analytics
       </h2>
 
-      <ResponsiveContainer width="100%" height={350}>
-        <BarChart data={chartData}>
-          <CartesianGrid stroke="#374151" />
+      <div className="h-80 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={chartData}
+            margin={{
+              top: 10,
+              right: 20,
+              left: 0,
+              bottom: 10,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
 
-          <XAxis dataKey="name" stroke="#ffffff" />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 12 }}
+            />
 
-          <YAxis stroke="#ffffff" />
+            <YAxis tick={{ fontSize: 12 }} />
 
-          <Tooltip />
+            <Tooltip />
 
-          <Bar
-            dataKey="Amount"
-            fill="#14B8A6"
-            radius={[8, 8, 0, 0]}
-          />
-        </BarChart>
-      </ResponsiveContainer>
+            <Bar
+              dataKey="Amount"
+              fill="#10B981"
+              radius={[8, 8, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

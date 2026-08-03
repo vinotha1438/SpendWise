@@ -1,91 +1,128 @@
 function SmartInsights({ expenses = [] }) {
   if (expenses.length === 0) {
-    return null;
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-bold text-slate-800">
+          💡 Smart Insights
+        </h2>
+
+        <div className="flex h-40 items-center justify-center text-slate-500">
+          No expense data available.
+        </div>
+      </div>
+    );
   }
 
-  const amounts = expenses.map((item) => Number(item.amount));
-
-  const totalExpense = amounts.reduce((a, b) => a + b, 0);
-  const averageExpense = totalExpense / expenses.length;
-
-  const highestExpense = expenses.reduce((max, item) =>
-    Number(item.amount) > Number(max.amount) ? item : max
+  const amounts = expenses.map((item) =>
+    Number(item.amount || 0)
   );
 
-  const lowestExpense = expenses.reduce((min, item) =>
-    Number(item.amount) < Number(min.amount) ? item : min
+  const totalExpense = amounts.reduce(
+    (sum, value) => sum + value,
+    0
+  );
+
+  const averageExpense =
+    totalExpense / expenses.length;
+
+  const highestExpense = expenses.reduce(
+    (max, item) =>
+      Number(item.amount || 0) >
+      Number(max.amount || 0)
+        ? item
+        : max
+  );
+
+  const lowestExpense = expenses.reduce(
+    (min, item) =>
+      Number(item.amount || 0) <
+      Number(min.amount || 0)
+        ? item
+        : min
   );
 
   const categoryTotals = {};
 
   expenses.forEach((item) => {
-    categoryTotals[item.category] =
-      (categoryTotals[item.category] || 0) + Number(item.amount);
+    const category = item.category || "Others";
+
+    categoryTotals[category] =
+      (categoryTotals[category] || 0) +
+      Number(item.amount || 0);
   });
 
-  const topCategory = Object.entries(categoryTotals).sort(
-    (a, b) => b[1] - a[1]
-  )[0];
+  const topCategory = Object.entries(
+    categoryTotals
+  ).sort((a, b) => b[1] - a[1])[0];
+
+  const cards = [
+    {
+      title: "🏆 Highest Expense",
+      subtitle:
+        highestExpense.title || "No Title",
+      value: `₹${Number(
+        highestExpense.amount
+      ).toLocaleString("en-IN")}`,
+    },
+    {
+      title: "💵 Lowest Expense",
+      subtitle:
+        lowestExpense.title || "No Title",
+      value: `₹${Number(
+        lowestExpense.amount
+      ).toLocaleString("en-IN")}`,
+    },
+    {
+      title: "📊 Average Expense",
+      subtitle: "Per Transaction",
+      value: `₹${averageExpense.toLocaleString(
+        "en-IN",
+        {
+          maximumFractionDigits: 0,
+        }
+      )}`,
+    },
+    {
+      title: "🥇 Top Category",
+      subtitle: topCategory?.[0] || "Others",
+      value: `₹${Number(
+        topCategory?.[1] || 0
+      ).toLocaleString("en-IN")}`,
+    },
+  ];
 
   return (
-    <div
-      style={{
-        marginTop: "25px",
-        background: "#111827",
-        borderRadius: "16px",
-        padding: "25px",
-        border: "1px solid #374151",
-      }}
-    >
-      <h2
-        style={{
-          color: "white",
-          marginBottom: "20px",
-        }}
-      >
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+      <h2 className="mb-6 text-xl font-bold text-slate-800">
         💡 Smart Insights
       </h2>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
-          gap: "20px",
-        }}
-      >
-        <div style={cardStyle}>
-          <h3>🏆 Highest Expense</h3>
-          <p>{highestExpense.title}</p>
-          <h2>₹{Number(highestExpense.amount).toLocaleString()}</h2>
-        </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
 
-        <div style={cardStyle}>
-          <h3>💵 Lowest Expense</h3>
-          <p>{lowestExpense.title}</p>
-          <h2>₹{Number(lowestExpense.amount).toLocaleString()}</h2>
-        </div>
+        {cards.map((card) => (
+          <div
+            key={card.title}
+            className="rounded-xl border border-slate-200 bg-slate-50 p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+          >
+            <h3 className="text-lg font-semibold text-slate-800">
+              {card.title}
+            </h3>
 
-        <div style={cardStyle}>
-          <h3>📊 Average Expense</h3>
-          <h2>₹{averageExpense.toFixed(0)}</h2>
-        </div>
+            <p className="mt-2 text-sm text-slate-500">
+              {card.subtitle}
+            </p>
 
-        <div style={cardStyle}>
-          <h3>🥇 Top Category</h3>
-          <p>{topCategory[0]}</p>
-          <h2>₹{topCategory[1].toLocaleString()}</h2>
-        </div>
+            <h2 className="mt-4 text-2xl font-bold text-emerald-600">
+              {card.value}
+            </h2>
+          </div>
+        ))}
+
       </div>
+
     </div>
   );
 }
-
-const cardStyle = {
-  background: "#1F2937",
-  color: "white",
-  padding: "20px",
-  borderRadius: "12px",
-  textAlign: "center",
-};
 
 export default SmartInsights;

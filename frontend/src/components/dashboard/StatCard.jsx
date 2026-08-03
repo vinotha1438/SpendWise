@@ -1,33 +1,72 @@
-function StatCard({ title, amount, color, isCurrency = true }) {
+function StatCard({
+  title,
+  amount,
+  icon,
+  color,
+  subtitle,
+}) {
+  const isNumber =
+    typeof amount === "number";
+
   return (
     <div
-      style={{
-        background: "white",
-        padding: "20px",
-        borderRadius: "16px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-        minWidth: "220px",
-        flex: 1,
-      }}
+      className="
+        w-full
+        h-full
+        relative
+        overflow-hidden
+        rounded-3xl
+        bg-white
+        border
+        border-slate-200
+        shadow-md
+        hover:shadow-xl
+        hover:-translate-y-1
+        transition-all
+        duration-300
+        p-6
+        flex
+        flex-col
+        justify-between
+      "
     >
-      <p
-        style={{
-          color: "#64748B",
-          fontSize: "14px",
-          marginBottom: "10px",
-        }}
-      >
-        {title}
-      </p>
+      <div className="flex items-start justify-between gap-4">
 
-      <h2
+        <div className="flex-1 min-w-0">
+
+          <p className="text-sm font-medium text-slate-500">
+            {title}
+          </p>
+
+          <h2 className="mt-3 break-words text-2xl font-bold text-slate-800 lg:text-3xl">
+            {isNumber
+              ? `₹${amount.toLocaleString("en-IN")}`
+              : amount}
+          </h2>
+
+          <p className="mt-2 text-xs text-slate-400">
+            {subtitle}
+          </p>
+
+        </div>
+
+        <div
+          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl text-3xl text-white shadow-lg"
+          style={{
+            background: color,
+          }}
+        >
+          {icon}
+        </div>
+
+      </div>
+
+      <div
+        className="absolute bottom-0 left-0 h-1 w-full"
         style={{
-          color: color,
-          fontSize: "28px",
+          background: color,
         }}
-      >
-        {isCurrency ? `₹ ${amount}` : amount}
-      </h2>
+      />
     </div>
   );
 }
