@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
-const db = require("./config/db");
 
+const goalRoutes = require("./routes/goalRoutes");
 const userRoutes = require("./routes/userRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const incomeRoutes = require("./routes/incomeRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const budgetRoutes = require("./routes/budgetRoutes");
+const recurringRoutes = require("./routes/recurringRoutes");
 
 const app = express();
 
@@ -22,26 +23,14 @@ app.use(expenseRoutes);
 app.use(incomeRoutes);
 app.use(categoryRoutes);
 app.use(budgetRoutes);
-console.log("Registering Income Routes...");
-app.get("/test123", (req, res) => {
-  res.send("TEST OK");
-});
-app.use("/", incomeRoutes);
+app.use(recurringRoutes);
+app.use("/goals", goalRoutes);
 
+// Test Route
 app.get("/", (req, res) => {
-    res.send("SpendWise Backend is Running 🚀");
-});
-
-app.get("/check-income", (req, res) => {
-    const incomeController = require("./controllers/incomeController");
-
-    res.send(incomeController.getIncome.toString());
+  res.send("SpendWise Backend is Running 🚀");
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
-
-app.get("/income-test", (req, res) => {
-  res.send("Income Route Working");
+  console.log(`Server running on http://localhost:${PORT}`);
 });

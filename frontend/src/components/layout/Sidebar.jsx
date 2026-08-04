@@ -51,8 +51,9 @@ function Sidebar({
   ];
 
   return (
-    <aside
-      className={`
+    <>
+      <aside
+        className={`
         fixed
         top-0
         left-0
@@ -67,66 +68,64 @@ function Sidebar({
         overflow-y-auto
         transition-transform
         duration-300
-        ${
-          sidebarOpen
+        ${sidebarOpen
             ? "translate-x-0"
             : "-translate-x-full"
-        }
+          }
         lg:translate-x-0
       `}
-    >
-      <div>
-        <div className="p-6 border-b border-slate-800">
-          <h2 className="text-2xl font-bold text-emerald-400">
-            💰 SpendWise
-          </h2>
+      >
+        <div>
+          <div className="p-6 border-b border-slate-800">
+            <h2 className="text-2xl font-bold text-emerald-400">
+              💰 SpendWise
+            </h2>
 
-          <p className="text-slate-400 text-sm mt-1">
-            Personal Finance
-          </p>
-        </div>
+            <p className="text-slate-400 text-sm mt-1">
+              Personal Finance
+            </p>
+          </div>
 
-        <nav className="p-4">
-          {menu.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 mb-2 transition-all ${
-                location.pathname === item.path
+          <nav className="p-4">
+            {menu.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 mb-2 transition-all ${location.pathname === item.path
                   ? "bg-emerald-500 text-white"
                   : "text-slate-300 hover:bg-slate-800"
-              }`}
-            >
-              <span>{item.icon}</span>
-              <span>{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </div>
+                  }`}
+              >
+                <span>{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
 
-      <div className="p-5 border-t border-slate-800">
-        <div className="rounded-xl bg-slate-800 p-5">
-          <p className="text-slate-400 text-sm">
-            Current Balance
-          </p>
+        <div className="p-5 border-t border-slate-800">
+          <div className="rounded-xl bg-slate-800 p-5">
+            <p className="text-slate-400 text-sm">
+              Current Balance
+            </p>
 
-          <h2
-            className={`text-3xl font-bold mt-2 ${
-              balance >= 0
+            <h2
+              className={`text-3xl font-bold mt-2 ${balance >= 0
                 ? "text-emerald-400"
                 : "text-red-400"
-            }`}
-          >
-            ₹{balance.toLocaleString("en-IN")}
-          </h2>
+                }`}
+            >
+              ₹{balance.toLocaleString("en-IN")}
+            </h2>
 
-          <p className="text-xs text-slate-500 mt-2">
-            Live Balance
-          </p>
+            <p className="text-xs text-slate-500 mt-2">
+              Live Balance
+            </p>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
 

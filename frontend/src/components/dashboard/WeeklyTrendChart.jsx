@@ -38,41 +38,86 @@ function WeeklyTrendChart({ expenses = [] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
+    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
-      <h2 className="mb-5 text-xl font-bold text-slate-800">
-        📈 Weekly Spending Trend
-      </h2>
+      <div className="mb-6">
 
-      <div className="h-72 w-full">
+        <h2 className="text-xl font-bold text-slate-800">
+          📈 Weekly Spending Trend
+        </h2>
 
-        <ResponsiveContainer width="100%" height="100%">
-
-          <LineChart data={data}>
-
-            <CartesianGrid strokeDasharray="3 3" />
-
-            <XAxis
-              dataKey="day"
-              tick={{ fontSize: 12 }}
-            />
-
-            <YAxis tick={{ fontSize: 12 }} />
-
-            <Tooltip />
-
-            <Line
-              type="monotone"
-              dataKey="amount"
-              stroke="#10B981"
-              strokeWidth={3}
-            />
-
-          </LineChart>
-
-        </ResponsiveContainer>
+        <p className="mt-1 text-sm text-slate-500">
+          Expense trend for the last 7 days.
+        </p>
 
       </div>
+
+      {expenses.length === 0 ? (
+
+        <div className="flex h-72 items-center justify-center text-slate-500">
+          No expense data available.
+        </div>
+
+      ) : (
+
+        <div className="h-72 w-full sm:h-80">
+
+          <ResponsiveContainer width="100%" height="100%">
+
+            <LineChart
+              data={data}
+              margin={{
+                top: 10,
+                right: 15,
+                left: 5,
+                bottom: 5,
+              }}
+            >
+
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+              />
+
+              <XAxis
+                dataKey="day"
+                tick={{
+                  fontSize: 12,
+                }}
+              />
+
+              <YAxis
+                tick={{
+                  fontSize: 12,
+                }}
+                tickFormatter={(value) => `₹${value}`}
+              />
+
+              <Tooltip
+                formatter={(value) => [
+                  `₹${Number(value).toLocaleString(
+                    "en-IN"
+                  )}`,
+                  "Expense",
+                ]}
+              />
+
+              <Line
+                type="monotone"
+                dataKey="amount"
+                stroke="#10B981"
+                strokeWidth={3}
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+
+            </LineChart>
+
+          </ResponsiveContainer>
+
+        </div>
+
+      )}
 
     </div>
   );

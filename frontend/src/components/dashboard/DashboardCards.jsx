@@ -20,7 +20,17 @@ function DashboardCards({
 
   return (
     <section className="mb-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+      <div
+        className="
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          xl:grid-cols-4
+          gap-5
+          xl:gap-6
+        "
+      >
 
         <StatCard
           title="Total Income"
@@ -55,6 +65,7 @@ function DashboardCards({
         />
 
       </div>
+
     </section>
   );
 }

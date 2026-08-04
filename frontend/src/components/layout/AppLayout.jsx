@@ -3,15 +3,12 @@ import { useData } from "../../context/DataContext";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
-function AppLayout({
-  children,
-}) {
+function AppLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { balance } = useData();
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-slate-100">
-
+    <div className="min-h-screen bg-slate-100">
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
@@ -19,29 +16,20 @@ function AppLayout({
       />
 
       <div
-        className="min-h-screen"
+        className="min-h-screen transition-all duration-300"
         style={{
-          marginLeft: "16rem",
-          width: "calc(100% - 16rem)",
+          marginLeft: window.innerWidth >= 1024 ? "256px" : "0px",
         }}
       >
-
         <Navbar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
 
-        <main
-          style={{
-            width: "100%",
-            padding: "24px",
-          }}
-        >
+        <main className="p-4 sm:p-6 lg:p-8 overflow-x-hidden">
           {children}
         </main>
-
       </div>
-
     </div>
   );
 }

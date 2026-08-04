@@ -4,9 +4,10 @@ function StatCard({
   icon,
   color,
   subtitle,
+  change,
+  changeType,
 }) {
-  const isNumber =
-    typeof amount === "number";
+  const isNumber = typeof amount === "number";
 
   return (
     <div
@@ -47,6 +48,20 @@ function StatCard({
           <p className="mt-2 text-xs text-slate-400">
             {subtitle}
           </p>
+
+          {change && (
+            <div
+              className={`mt-3 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                changeType === "positive"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : changeType === "negative"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              {change}
+            </div>
+          )}
 
         </div>
 

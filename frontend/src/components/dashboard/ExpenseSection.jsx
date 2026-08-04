@@ -10,21 +10,23 @@ function ExpenseSection({
   onEdit,
 }) {
   return (
-    <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+    <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mb-6 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
 
         <div className="min-w-0">
+
           <h2 className="text-2xl font-bold text-slate-800">
             Expense History
           </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-slate-500">
             View, search and manage all your expenses.
           </p>
+
         </div>
 
-        <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+        <div className="grid w-full gap-3 sm:grid-cols-2 xl:w-auto">
 
           <input
             type="text"
@@ -33,7 +35,6 @@ function ExpenseSection({
             onChange={(e) => setSearch(e.target.value)}
             className="
               w-full
-              sm:w-72
               rounded-xl
               border
               border-slate-300
@@ -54,7 +55,6 @@ function ExpenseSection({
             }
             className="
               w-full
-              sm:w-56
               rounded-xl
               border
               border-slate-300
@@ -88,7 +88,7 @@ function ExpenseSection({
 
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200">
 
         <TransactionTable
           expenses={expenses}
@@ -98,7 +98,7 @@ function ExpenseSection({
 
       </div>
 
-    </div>
+    </section>
   );
 }
 

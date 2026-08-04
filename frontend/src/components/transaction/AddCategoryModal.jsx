@@ -35,7 +35,7 @@ function AddCategoryModal({ onClose, onSuccess }) {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-          "Failed to add category"
+        "Failed to add category"
       );
     }
   };
@@ -76,6 +76,23 @@ function AddCategoryModal({ onClose, onSuccess }) {
         <option>📚</option>
         <option>🏠</option>
         <option>💡</option>
+        <option>🥘</option>
+        <option>🍲</option>
+        <option>🍜</option>
+        <option>🍕</option>
+        <option>🍫</option>
+        <option>☕</option>
+        <option>⛽</option>
+        <option>🍍</option>
+        <option>🍹</option>
+        <option>🥛</option>
+        <option>🏍️</option>
+        <option>🥚</option>
+        <option>🧋</option>
+        <option>🚆</option>
+        <option>🚎</option>
+        <option>🕶️</option>
+        <option>🍄</option>
       </select>
 
       <div
