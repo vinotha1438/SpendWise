@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import API from "../../services/api";
 
 function AddGoalModal({ open, onClose, onSuccess }) {
+  const { t } = useTranslation();
+
   const [goal_name, setGoalName] = useState("");
   const [target_amount, setTargetAmount] = useState("");
   const [target_date, setTargetDate] = useState("");
@@ -14,7 +17,7 @@ function AddGoalModal({ open, onClose, onSuccess }) {
     e.preventDefault();
 
     if (!goal_name || !target_amount || !target_date) {
-      return toast.error("Please fill all fields");
+      return toast.error(t("pleaseFillAllFields"));
     }
 
     try {
@@ -36,7 +39,7 @@ function AddGoalModal({ open, onClose, onSuccess }) {
         }
       );
 
-      toast.success("Goal Created Successfully");
+      toast.success(t("goalCreatedSuccessfully"));
 
       setGoalName("");
       setTargetAmount("");
@@ -45,43 +48,56 @@ function AddGoalModal({ open, onClose, onSuccess }) {
       onSuccess();
       onClose();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create goal");
+      toast.error(
+        error.response?.data?.message ||
+          t("failedToCreateGoal")
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 
-        <h2 className="text-2xl font-bold mb-6">
-          🎯 Add Savings Goal
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+        <h2 className="mb-6 text-2xl font-bold">
+          🎯 {t("addSavingsGoal")}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
 
           <input
             type="text"
-            placeholder="Goal Name"
-            className="w-full border rounded-xl p-3"
+            placeholder={t("goalName")}
+            className="w-full rounded-xl border p-3"
             value={goal_name}
-            onChange={(e) => setGoalName(e.target.value)}
+            onChange={(e) =>
+              setGoalName(e.target.value)
+            }
           />
 
           <input
             type="number"
-            placeholder="Target Amount"
-            className="w-full border rounded-xl p-3"
+            placeholder={t("targetAmount")}
+            className="w-full rounded-xl border p-3"
             value={target_amount}
-            onChange={(e) => setTargetAmount(e.target.value)}
+            onChange={(e) =>
+              setTargetAmount(e.target.value)
+            }
           />
 
           <input
             type="date"
-            className="w-full border rounded-xl p-3"
+            className="w-full rounded-xl border p-3"
             value={target_date}
-            onChange={(e) => setTargetDate(e.target.value)}
+            onChange={(e) =>
+              setTargetDate(e.target.value)
+            }
           />
 
           <div className="flex justify-end gap-3 pt-3">
@@ -89,17 +105,19 @@ function AddGoalModal({ open, onClose, onSuccess }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300"
+              className="rounded-xl bg-slate-200 px-5 py-2 hover:bg-slate-300"
             >
-              Cancel
+              {t("cancel")}
             </button>
 
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white"
+              className="rounded-xl bg-emerald-500 px-5 py-2 text-white hover:bg-emerald-600"
             >
-              {loading ? "Saving..." : "Save Goal"}
+              {loading
+                ? t("saving")
+                : t("saveGoal")}
             </button>
 
           </div>
@@ -107,6 +125,7 @@ function AddGoalModal({ open, onClose, onSuccess }) {
         </form>
 
       </div>
+
     </div>
   );
 }

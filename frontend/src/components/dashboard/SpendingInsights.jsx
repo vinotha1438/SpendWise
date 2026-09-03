@@ -1,8 +1,12 @@
-function SpendingInsights({ expenses }) {
+import { useTranslation } from "react-i18next";
+
+function SpendingInsights({ expenses = [] }) {
+  const { t } = useTranslation();
+
   if (!expenses.length) return null;
 
   const total = expenses.reduce(
-    (sum, item) => sum + Number(item.amount),
+    (sum, item) => sum + Number(item.amount || 0),
     0
   );
 
@@ -13,7 +17,7 @@ function SpendingInsights({ expenses }) {
 
     categoryTotals[category] =
       (categoryTotals[category] || 0) +
-      Number(item.amount);
+      Number(item.amount || 0);
   });
 
   const highestCategory = Object.entries(categoryTotals).sort(
@@ -23,57 +27,46 @@ function SpendingInsights({ expenses }) {
   const average = Math.round(total / expenses.length);
 
   return (
-    <div
-      style={{
-        background: "white",
-        padding: "20px",
-        borderRadius: "15px",
-        marginBottom: "25px",
-        boxShadow: "0 5px 15px rgba(0,0,0,.08)",
-      }}
-    >
-      <h3
-        style={{
-          marginBottom: "15px",
-          color: "#0F172A",
-        }}
-      >
-        🧠 Spending Insights
-      </h3>
+    <section className="mb-8 rounded-2xl border border-border bg-card p-5 shadow-sm">
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
-        }}
-      >
-        <div>
-          💰 Total Spending :
-          <strong> ₹{total.toLocaleString()}</strong>
-        </div>
+      <h2 className="mb-5 text-xl font-bold text-card-foreground">
+        🧠 {t("spendingInsights")}
+      </h2>
 
-        <div>
-          📊 Average Transaction :
-          <strong> ₹{average.toLocaleString()}</strong>
-        </div>
+      <div className="flex flex-col gap-3">
 
-        <div>
-          🔥 Highest Spending Category :
-          <strong>
-            {" "}
-            {highestCategory[0]} (₹
-            {highestCategory[1].toLocaleString()})
+        <div className="text-foreground">
+          💰 {t("totalSpending")} :
+          <strong className="ml-1">
+            ₹{total.toLocaleString("en-IN")}
           </strong>
         </div>
 
-        <div style={{ color: "#16A34A" }}>
-          ✅ Tip: Try reducing expenses in{" "}
-          <strong>{highestCategory[0]}</strong> to improve your
-          monthly savings.
+        <div className="text-foreground">
+          📊 {t("averageTransaction")} :
+          <strong className="ml-1">
+            ₹{average.toLocaleString("en-IN")}
+          </strong>
         </div>
+
+        <div className="text-foreground">
+          🔥 {t("highestSpendingCategory")} :
+          <strong className="ml-1">
+            {highestCategory[0]} (
+            ₹{highestCategory[1].toLocaleString("en-IN")})
+          </strong>
+        </div>
+
+        <div className="text-emerald-600 dark:text-emerald-400">
+          ✅ {t("tip")}:{" "}
+          {t("reduceExpenses", {
+            category: highestCategory[0],
+          })}
+        </div>
+
       </div>
-    </div>
+
+    </section>
   );
 }
 

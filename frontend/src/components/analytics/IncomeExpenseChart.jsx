@@ -1,17 +1,17 @@
 import {
-  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
   CartesianGrid,
+  Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
 
 function IncomeExpenseChart({
-  income = [],
   expenses = [],
+  income = [],
 }) {
   const totalIncome = income.reduce(
     (sum, item) => sum + Number(item.amount || 0),
@@ -23,81 +23,89 @@ function IncomeExpenseChart({
     0
   );
 
-  if (income.length === 0 && expenses.length === 0) {
-    return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-bold text-slate-800">
-          📊 Income vs Expense
-        </h2>
-
-        <div className="flex h-[350px] items-center justify-center text-slate-500">
-          No financial data available.
-        </div>
-      </div>
-    );
-  }
-
   const data = [
     {
-      name: "Overview",
-      Income: totalIncome,
-      Expense: totalExpense,
+      name: "Income",
+      amount: totalIncome,
+    },
+    {
+      name: "Expense",
+      amount: totalExpense,
     },
   ];
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-slate-800">
+          📊 Income vs Expense
+        </h2>
 
-      <h2 className="mb-6 text-xl font-bold text-slate-800">
-        📊 Income vs Expense
-      </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Compare your total income and expenses.
+        </p>
+      </div>
 
-      <ResponsiveContainer
-        width="100%"
-        height={350}
-      >
-        <BarChart data={data}>
+      <div className="h-[320px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={data}
+            margin={{
+              top: 10,
+              right: 10,
+              left: 0,
+              bottom: 10,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
 
-          <CartesianGrid
-            strokeDasharray="3 3"
-            vertical={false}
-          />
+            <XAxis dataKey="name" />
 
-          <XAxis
-            dataKey="name"
-            tick={{ fontSize: 13 }}
-          />
+            <YAxis
+              tickFormatter={(value) =>
+                `₹${Number(value).toLocaleString("en-IN")}`
+              }
+            />
 
-          <YAxis
-            tickFormatter={(value) =>
-              `₹${value.toLocaleString("en-IN")}`
-            }
-          />
+            <Tooltip
+              formatter={(value) =>
+                `₹${Number(value).toLocaleString("en-IN")}`
+              }
+            />
 
-          <Tooltip
-            formatter={(value) => [
-              `₹${Number(value).toLocaleString("en-IN")}`,
-              "",
-            ]}
-          />
+            <Legend />
 
-          <Legend />
+            <Bar
+              dataKey="amount"
+              name="Amount"
+              fill="#10B981"
+              radius={[8, 8, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
-          <Bar
-            dataKey="Income"
-            fill="#22C55E"
-            radius={[8, 8, 0, 0]}
-          />
+      <div className="mt-4 grid grid-cols-2 gap-4">
+        <div className="rounded-xl bg-emerald-50 p-4">
+          <p className="text-sm text-slate-500">
+            Total Income
+          </p>
 
-          <Bar
-            dataKey="Expense"
-            fill="#EF4444"
-            radius={[8, 8, 0, 0]}
-          />
+          <p className="mt-1 text-xl font-bold text-emerald-600">
+            ₹{totalIncome.toLocaleString("en-IN")}
+          </p>
+        </div>
 
-        </BarChart>
-      </ResponsiveContainer>
+        <div className="rounded-xl bg-red-50 p-4">
+          <p className="text-sm text-slate-500">
+            Total Expense
+          </p>
 
+          <p className="mt-1 text-xl font-bold text-red-600">
+            ₹{totalExpense.toLocaleString("en-IN")}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,11 +1,15 @@
 import { Target, Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 function GoalCard({
   goal,
   onEdit,
   onDelete,
   onAddMoney,
+  onHistory,
 }) {
+  const { t } = useTranslation();
+
   const target = Number(goal.target_amount || 0);
   const saved = Number(goal.saved_amount || 0);
 
@@ -14,10 +18,10 @@ function GoalCard({
       ? Math.min((saved / target) * 100, 100)
       : 0;
 
+  const remaining = Math.max(target - saved, 0);
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-lg">
-
-      {/* Header */}
 
       <div className="flex items-center justify-between">
 
@@ -31,20 +35,19 @@ function GoalCard({
           </div>
 
           <div>
-
             <h2 className="text-lg font-bold text-slate-800">
               {goal.goal_name}
             </h2>
 
             <div className="mt-1 flex items-center gap-1 text-sm text-slate-500">
               <Calendar size={14} />
+
               {goal.target_date
-                ? new Date(goal.target_date).toLocaleDateString(
-                    "en-IN"
-                  )
+                ? new Date(
+                    goal.target_date
+                  ).toLocaleDateString("en-IN")
                 : "-"}
             </div>
-
           </div>
 
         </div>
@@ -55,13 +58,13 @@ function GoalCard({
 
       </div>
 
-      {/* Progress */}
-
       <div className="mt-6">
 
         <div className="mb-2 flex justify-between text-sm">
 
-          <span>Saved</span>
+          <span>
+            {t("savedAmount")}
+          </span>
 
           <span className="font-semibold text-emerald-600">
             ₹{saved.toLocaleString("en-IN")}
@@ -83,42 +86,47 @@ function GoalCard({
         <div className="mt-3 flex justify-between text-sm text-slate-600">
 
           <span>
-            Target ₹
+            {t("budget")} ₹
             {target.toLocaleString("en-IN")}
           </span>
 
           <span>
-            Remaining ₹
-            {(target - saved).toLocaleString("en-IN")}
+            {t("remaining")} ₹
+            {remaining.toLocaleString("en-IN")}
           </span>
 
         </div>
 
       </div>
 
-      {/* Buttons */}
-
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 grid grid-cols-2 gap-3">
 
         <button
           onClick={() => onAddMoney(goal)}
-          className="flex-1 rounded-xl bg-emerald-500 py-2 font-semibold text-white transition hover:bg-emerald-600"
+          className="rounded-xl bg-emerald-500 py-2 font-semibold text-white hover:bg-emerald-600"
         >
-          Add Money
+          + {t("addMoney")}
         </button>
 
         <button
           onClick={() => onEdit(goal)}
-          className="rounded-xl bg-blue-100 px-4 py-2 font-medium text-blue-700 transition hover:bg-blue-200"
+          className="rounded-xl bg-blue-500 py-2 font-semibold text-white hover:bg-blue-600"
         >
-          Edit
+          {t("edit")}
+        </button>
+
+        <button
+          onClick={() => onHistory(goal)}
+          className="rounded-xl bg-purple-500 py-2 font-semibold text-white hover:bg-purple-600"
+        >
+          {t("history")}
         </button>
 
         <button
           onClick={() => onDelete(goal.id)}
-          className="rounded-xl bg-red-100 px-4 py-2 font-medium text-red-600 transition hover:bg-red-200"
+          className="rounded-xl bg-red-500 py-2 font-semibold text-white hover:bg-red-600"
         >
-          Delete
+          {t("delete")}
         </button>
 
       </div>

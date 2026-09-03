@@ -1,49 +1,35 @@
 import { useEffect, useMemo, useState } from "react";
 import API from "../services/api";
+import { useTranslation } from "react-i18next";
+import { matchesDateFilter, sortTransactions } from "../utils/dateFilter";
 
+import { useData } from "../context/DataContext";
 import AppLayout from "../components/layout/AppLayout";
 import AddIncomeModal from "../components/transaction/AddIncomeModal";
 import IncomeTable from "../components/transaction/IncomeTable";
 
 function Income() {
-  const [income, setIncome] = useState([]);
+  const { t } = useTranslation();
+
+  // Single source of truth — same income array Dashboard, Analytics,
+  // Reports etc. all read from. No more local fetch/local state here.
+  const { income, refreshData } = useData();
 
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [dateFilter, setDateFilter] = useState("All");
+  const [sortBy, setSortBy] = useState("Newest");
+  const [showIncomeModal, setShowIncomeModal] = useState(false);
+  const [editingIncome, setEditingIncome] = useState(null);
 
-  const [showIncomeModal, setShowIncomeModal] =
-    useState(false);
-
-  const [editingIncome, setEditingIncome] =
-    useState(null);
-
-  const fetchIncome = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await API.get("/income", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setIncome(
-        Array.isArray(response.data)
-          ? response.data
-          : []
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+  // Refresh on mount in case this page is opened directly (e.g. via
+  // URL/refresh) without visiting Dashboard first.
   useEffect(() => {
-    fetchIncome();
+    refreshData();
   }, []);
 
   const filteredIncome = useMemo(() => {
-    return income.filter((item) => {
+    const filtered = income.filter((item) => {
       const matchSearch = item.title
         ?.toLowerCase()
         .includes(search.toLowerCase());
@@ -52,9 +38,16 @@ function Income() {
         selectedCategory === "" ||
         item.category === selectedCategory;
 
-      return matchSearch && matchCategory;
+      const matchDate = matchesDateFilter(
+        item.income_date,
+        dateFilter
+      );
+
+      return matchSearch && matchCategory && matchDate;
     });
-  }, [income, search, selectedCategory]);
+
+    return sortTransactions(filtered, sortBy, "income_date");
+  }, [income, search, selectedCategory, dateFilter, sortBy]);
 
   const totalIncome = filteredIncome.reduce(
     (sum, item) => sum + Number(item.amount || 0),
@@ -95,9 +88,7 @@ function Income() {
 
   const averageIncome =
     filteredIncome.length > 0
-      ? Math.round(
-        totalIncome / filteredIncome.length
-      )
+      ? Math.round(totalIncome / filteredIncome.length)
       : 0;
 
   const deleteIncome = async (id) => {
@@ -110,11 +101,11 @@ function Income() {
         },
       });
 
-      fetchIncome();
+      refreshData();
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Delete Failed"
+          t("deleteFailed")
       );
     }
   };
@@ -132,7 +123,7 @@ function Income() {
           setOpen={setShowIncomeModal}
           incomeToEdit={editingIncome}
           onSuccess={() => {
-            fetchIncome();
+            refreshData();
             setEditingIncome(null);
             setShowIncomeModal(false);
           }}
@@ -140,19 +131,15 @@ function Income() {
       )}
 
       <AppLayout>
-
         <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-
           <div>
-
             <h1 className="text-3xl font-bold text-slate-800">
-              💰 Income Tracker
+              💰 {t("incomeTracker")}
             </h1>
 
             <p className="mt-2 text-slate-500">
-              Manage all your income in one place.
+              {t("manageIncome")}
             </p>
-
           </div>
 
           <button
@@ -162,72 +149,58 @@ function Income() {
             }}
             className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-600"
           >
-            + Add Income
+            + {t("addIncome")}
           </button>
-
         </div>
 
         <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-
           <div className="rounded-2xl bg-white p-6 shadow">
-
             <p className="text-slate-500">
-              Total Income
+              {t("totalIncome")}
             </p>
 
             <h2 className="mt-3 text-3xl font-bold text-emerald-600">
               ₹{totalIncome.toLocaleString("en-IN")}
             </h2>
-
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow">
-
             <p className="text-slate-500">
-              Today's Income
+              {t("todaysIncome")}
             </p>
 
             <h2 className="mt-3 text-3xl font-bold text-blue-600">
               ₹{todayIncome.toLocaleString("en-IN")}
             </h2>
-
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow">
-
             <p className="text-slate-500">
-              This Month
+              {t("thisMonth")}
             </p>
 
             <h2 className="mt-3 text-3xl font-bold text-purple-600">
               ₹{thisMonthIncome.toLocaleString("en-IN")}
             </h2>
-
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow">
-
             <p className="text-slate-500">
-              Average Income
+              {t("averageIncome")}
             </p>
 
             <h2 className="mt-3 text-3xl font-bold text-orange-500">
               ₹{averageIncome.toLocaleString("en-IN")}
             </h2>
-
           </div>
-
         </div>
 
         <div className="mb-6 flex flex-col gap-4 lg:flex-row">
-
           <input
             type="text"
-            placeholder="🔍 Search Income..."
+            placeholder={`🔍 ${t("searchIncome")}`}
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-emerald-500"
           />
 
@@ -239,19 +212,48 @@ function Income() {
             className="rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none"
           >
             <option value="">
-              All Categories
+              {t("allCategories")}
             </option>
 
-            <option>Salary</option>
-            <option>Business</option>
-            <option>Freelance</option>
-            <option>Investment</option>
-            <option>Gift</option>
-            <option>Bonus</option>
-            <option>Others</option>
-
+            <option value="Salary">{t("salary")}</option>
+            <option value="Business">{t("business")}</option>
+            <option value="Freelance">{t("freelance")}</option>
+            <option value="Investment">{t("investment")}</option>
+            <option value="Gift">{t("gift")}</option>
+            <option value="Bonus">{t("bonus")}</option>
+            <option value="Others">{t("others")}</option>
           </select>
 
+          <select
+            value={dateFilter}
+            onChange={(e) =>
+              setDateFilter(e.target.value)
+            }
+            className="rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none"
+          >
+            <option value="All">All Time</option>
+            <option value="Today">Today</option>
+            <option value="This Week">This Week</option>
+            <option value="This Month">This Month</option>
+            <option value="This Year">This Year</option>
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(e) =>
+              setSortBy(e.target.value)
+            }
+            className="rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none"
+          >
+            <option value="Newest">Newest First</option>
+            <option value="Oldest">Oldest First</option>
+            <option value="Amount High-Low">
+              Amount: High to Low
+            </option>
+            <option value="Amount Low-High">
+              Amount: Low to High
+            </option>
+          </select>
         </div>
 
         <IncomeTable
@@ -259,9 +261,7 @@ function Income() {
           onEdit={editIncome}
           onDelete={deleteIncome}
         />
-
       </AppLayout>
-
     </>
   );
 }

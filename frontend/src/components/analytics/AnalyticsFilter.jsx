@@ -74,7 +74,6 @@ function AnalyticsFilter({
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 
           <div>
-
             <label className="mb-2 block text-sm font-medium text-slate-700">
               From Date
             </label>
@@ -87,11 +86,9 @@ function AnalyticsFilter({
               }
               className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
             />
-
           </div>
 
           <div>
-
             <label className="mb-2 block text-sm font-medium text-slate-700">
               To Date
             </label>
@@ -104,29 +101,24 @@ function AnalyticsFilter({
               }
               className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
             />
-
           </div>
 
           <div className="flex items-end">
-
             <button
               onClick={handleApply}
               className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-700"
             >
               Apply
             </button>
-
           </div>
 
           <div className="flex items-end">
-
             <button
               onClick={handleReset}
               className="w-full rounded-xl bg-slate-200 px-4 py-3 font-semibold text-slate-700 transition hover:bg-slate-300"
             >
               Reset
             </button>
-
           </div>
 
         </div>

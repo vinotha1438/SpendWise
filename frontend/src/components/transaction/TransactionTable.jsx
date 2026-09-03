@@ -7,12 +7,12 @@ function TransactionTable({
 }) {
   if (expenses.length === 0) {
     return (
-      <div className="py-16 text-center">
-        <h3 className="text-xl font-semibold text-slate-700">
+      <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+        <h3 className="text-xl font-bold text-foreground">
           No Expenses Found
         </h3>
 
-        <p className="mt-2 text-slate-500">
+        <p className="mt-2 text-muted-foreground">
           Add your first expense to start tracking.
         </p>
       </div>
@@ -20,126 +20,225 @@ function TransactionTable({
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <>
+      {/* ================= MOBILE VIEW ================= */}
 
-      <table className="w-full min-w-[700px] lg:min-w-full border-collapse">
+      <div className="block space-y-4 md:hidden">
 
-        <thead className="bg-slate-100">
+        {expenses.map((expense) => (
+          <div
+            key={expense.id}
+            className="
+              rounded-2xl
+              border border-border
+              bg-card
+              p-4
+              text-card-foreground
+              shadow-sm
+              transition-colors
+            "
+          >
 
-          <tr>
+            <div className="flex items-center justify-between gap-3">
 
-            <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">
-              Title
-            </th>
-
-            <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">
-              Category
-            </th>
-
-            <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">
-              Payment
-            </th>
-
-            <th className="px-5 py-4 text-right text-sm font-semibold text-slate-700 whitespace-nowrap">
-              Amount
-            </th>
-
-            <th className="px-5 py-4 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">
-              Date
-            </th>
-
-            <th className="px-5 py-4 text-center text-sm font-semibold text-slate-700 whitespace-nowrap">
-              Actions
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          {expenses.map((expense) => (
-
-            <tr
-              key={expense.id}
-              className="border-t border-slate-200 transition hover:bg-slate-50"
-            >
-
-              <td className="px-5 py-4 font-medium text-slate-800 whitespace-nowrap">
+              <h3 className="break-words font-bold text-foreground">
                 {expense.title}
-              </td>
+              </h3>
 
-              <td className="px-5 py-4 whitespace-nowrap">
-
-                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                  {expense.category}
-                </span>
-
-              </td>
-
-              <td className="px-5 py-4 text-slate-600 whitespace-nowrap">
-                {expense.payment_method}
-              </td>
-
-              <td className="px-5 py-4 text-right font-bold text-red-500 whitespace-nowrap">
+              <span className="shrink-0 font-bold text-red-500">
                 ₹
-                {Number(expense.amount).toLocaleString(
-                  "en-IN"
-                )}
-              </td>
+                {Number(expense.amount).toLocaleString("en-IN")}
+              </span>
 
-              <td className="px-5 py-4 text-slate-600 whitespace-nowrap">
-                {expense.expense_date
-                  ? new Date(
+            </div>
+
+            {expense.where_to_pay && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                Paid to: {expense.where_to_pay}
+              </p>
+            )}
+
+            <div className="mt-3 flex flex-wrap gap-2">
+
+              <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                {expense.category}
+              </span>
+
+              <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+                {expense.payment_method}
+              </span>
+
+            </div>
+
+            <p className="mt-3 text-sm text-muted-foreground">
+              📅{" "}
+              {expense.expense_date
+                ? new Date(
                     expense.expense_date
                   ).toLocaleDateString("en-IN")
-                  : "-"}
-              </td>
+                : "-"}
+            </p>
 
-              <td className="px-5 py-4">
+            <div className="mt-4 flex gap-2">
 
+              <button
+                onClick={() => onEdit(expense)}
+                className="flex-1 rounded-xl bg-blue-500 py-2 text-white transition hover:bg-blue-600"
+              >
                 <div className="flex items-center justify-center gap-2">
-
-                  <button
-                    onClick={() => onEdit(expense)}
-                    className="flex items-center gap-1 rounded-lg bg-blue-500 px-3 py-2 text-white transition hover:bg-blue-600"
-                  >
-                    <Pencil size={16} />
-                    <span className="hidden sm:inline">
-                      Edit
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          "Delete this expense?"
-                        )
-                      ) {
-                        onDelete(expense.id);
-                      }
-                    }}
-                    className="flex items-center gap-1 rounded-lg bg-red-500 px-3 py-2 text-white transition hover:bg-red-600"
-                  >
-                    <Trash2 size={16} />
-                    <span className="hidden sm:inline">
-                      Delete
-                    </span>
-                  </button>
-
+                  <Pencil size={16} />
+                  Edit
                 </div>
+              </button>
 
-              </td>
+              <button
+                onClick={() => {
+                  if (window.confirm("Delete this expense?")) {
+                    onDelete(expense.id);
+                  }
+                }}
+                className="flex-1 rounded-xl bg-red-500 py-2 text-white transition hover:bg-red-600"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Trash2 size={16} />
+                  Delete
+                </div>
+              </button>
+
+            </div>
+
+          </div>
+        ))}
+
+      </div>
+
+      {/* ================= DESKTOP VIEW ================= */}
+
+      <div className="hidden overflow-x-auto rounded-2xl border border-border bg-card md:block">
+
+        <table className="w-full border-collapse">
+
+          <thead className="bg-muted">
+
+            <tr className="text-foreground">
+
+              <th className="px-4 py-3 text-left">
+                Title
+              </th>
+
+              <th className="px-4 py-3 text-left">
+                Paid To
+              </th>
+
+              <th className="px-4 py-3 text-left">
+                Category
+              </th>
+
+              <th className="px-4 py-3 text-left">
+                Payment
+              </th>
+
+              <th className="px-4 py-3 text-right">
+                Amount
+              </th>
+
+              <th className="px-4 py-3 text-left">
+                Date
+              </th>
+
+              <th className="px-4 py-3 text-center">
+                Actions
+              </th>
 
             </tr>
 
-          ))}
+          </thead>
 
-        </tbody>
-      </table>
+          <tbody>
 
-    </div>
+            {expenses.map((expense) => (
+              <tr
+                key={expense.id}
+                className="
+                  border-t border-border
+                  text-foreground
+                  transition-colors
+                  hover:bg-muted/50
+                "
+              >
+
+                <td className="px-4 py-4">
+                  {expense.title}
+                </td>
+
+                <td className="px-4 py-4 text-muted-foreground">
+                  {expense.where_to_pay || "-"}
+                </td>
+
+                <td className="px-4 py-4">
+
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                    {expense.category}
+                  </span>
+
+                </td>
+
+                <td className="px-4 py-4 text-muted-foreground">
+                  {expense.payment_method}
+                </td>
+
+                <td className="px-4 py-4 text-right font-bold text-red-500">
+                  ₹
+                  {Number(expense.amount).toLocaleString("en-IN")}
+                </td>
+
+                <td className="px-4 py-4 text-muted-foreground">
+                  {expense.expense_date
+                    ? new Date(
+                        expense.expense_date
+                      ).toLocaleDateString("en-IN")
+                    : "-"}
+                </td>
+
+                <td className="px-4 py-4">
+
+                  <div className="flex justify-center gap-2">
+
+                    <button
+                      onClick={() => onEdit(expense)}
+                      className="rounded-lg bg-blue-500 p-2 text-white transition hover:bg-blue-600"
+                    >
+                      <Pencil size={16} />
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            "Delete this expense?"
+                          )
+                        ) {
+                          onDelete(expense.id);
+                        }
+                      }}
+                      className="rounded-lg bg-red-500 p-2 text-white transition hover:bg-red-600"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+            ))}
+
+          </tbody>
+
+        </table>
+
+      </div>
+    </>
   );
 }
 

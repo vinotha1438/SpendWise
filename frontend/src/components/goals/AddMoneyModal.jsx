@@ -1,6 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import API from "../../services/api";
+import { useData } from "../../context/DataContext";
 
 function AddMoneyModal({
   open,
@@ -8,7 +9,12 @@ function AddMoneyModal({
   goal,
   onSuccess,
 }) {
+  // Shared accounts list — same source as everywhere else, so the
+  // balances shown here always match Accounts/Dashboard/Sidebar.
+  const { accounts, refreshData } = useData();
+
   const [amount, setAmount] = useState("");
+  const [accountId, setAccountId] = useState("");
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
@@ -20,6 +26,10 @@ function AddMoneyModal({
       return toast.error("Enter a valid amount");
     }
 
+    if (!accountId) {
+      return toast.error("Please select an account");
+    }
+
     try {
       setLoading(true);
 
@@ -29,6 +39,7 @@ function AddMoneyModal({
         `/goals/add-money/${goal.id}`,
         {
           amount: Number(amount),
+          account_id: Number(accountId),
         },
         {
           headers: {
@@ -40,6 +51,11 @@ function AddMoneyModal({
       toast.success("Money Added Successfully");
 
       setAmount("");
+      setAccountId("");
+
+      // This money came out of a real account — make sure
+      // Sidebar/Dashboard/Accounts reflect the new balance too.
+      refreshData();
 
       onSuccess();
     } catch (error) {
@@ -79,6 +95,40 @@ function AddMoneyModal({
               setAmount(e.target.value)
             }
           />
+
+          <div>
+            <label className="mb-1 block text-sm font-semibold text-slate-700">
+              From Account
+            </label>
+
+            <select
+              className="w-full rounded-xl border border-slate-300 p-3"
+              value={accountId}
+              onChange={(e) =>
+                setAccountId(e.target.value)
+              }
+            >
+              <option value="">
+                Select Account
+              </option>
+
+              {accounts.map((account) => (
+                <option
+                  key={account.id}
+                  value={account.id}
+                >
+                  {account.account_name} — ₹
+                  {Number(
+                    account.current_balance || 0
+                  ).toLocaleString("en-IN")}
+                </option>
+              ))}
+            </select>
+
+            <p className="mt-1 text-xs text-slate-400">
+              This amount will be deducted from the selected account's balance.
+            </p>
+          </div>
 
           <div className="flex justify-end gap-3">
 

@@ -10,42 +10,23 @@ function StatCard({
   const isNumber = typeof amount === "number";
 
   return (
-    <div
-      className="
-        w-full
-        h-full
-        relative
-        overflow-hidden
-        rounded-3xl
-        bg-white
-        border
-        border-slate-200
-        shadow-md
-        hover:shadow-xl
-        hover:-translate-y-1
-        transition-all
-        duration-300
-        p-6
-        flex
-        flex-col
-        justify-between
-      "
-    >
-      <div className="flex items-start justify-between gap-4">
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-colors">
 
-        <div className="flex-1 min-w-0">
+      <div className="flex items-center justify-between gap-4">
 
-          <p className="text-sm font-medium text-slate-500">
+        <div className="min-w-0 flex-1">
+
+          <p className="text-sm font-medium text-muted-foreground">
             {title}
           </p>
 
-          <h2 className="mt-3 break-words text-2xl font-bold text-slate-800 lg:text-3xl">
+          <h2 className="mt-3 break-words text-2xl font-bold text-card-foreground lg:text-3xl">
             {isNumber
               ? `₹${amount.toLocaleString("en-IN")}`
               : amount}
           </h2>
 
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-muted-foreground">
             {subtitle}
           </p>
 
@@ -53,10 +34,10 @@ function StatCard({
             <div
               className={`mt-3 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
                 changeType === "positive"
-                  ? "bg-emerald-100 text-emerald-700"
+                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                   : changeType === "negative"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-slate-100 text-slate-600"
+                  ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                  : "bg-muted text-muted-foreground"
               }`}
             >
               {change}
@@ -82,6 +63,7 @@ function StatCard({
           background: color,
         }}
       />
+
     </div>
   );
 }

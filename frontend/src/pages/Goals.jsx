@@ -1,199 +1,224 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import API from "../services/api";
+import { useData } from "../context/DataContext";
 
 import AppLayout from "../components/layout/AppLayout";
 import GoalCard from "../components/goals/GoalCard";
 import AddGoalModal from "../components/goals/AddGoalModal";
 import EditGoalModal from "../components/goals/EditGoalModal";
 import AddMoneyModal from "../components/goals/AddMoneyModal";
+import GoalHistoryModal from "../components/goals/GoalHistoryModal";
 
 function Goals() {
-    const [goals, setGoals] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
-    const [openModal, setOpenModal] = useState(false);
+  const { refreshData } = useData();
 
-    const [editModalOpen, setEditModalOpen] =
-        useState(false);
+  const [goals, setGoals] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const [moneyModalOpen, setMoneyModalOpen] =
-        useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
-    const [selectedGoal, setSelectedGoal] =
-        useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
-    const fetchGoals = async () => {
-        try {
-            const token = localStorage.getItem("token");
+  const [moneyModalOpen, setMoneyModalOpen] = useState(false);
 
-            const res = await API.get("/goals", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+  const [selectedGoal, setSelectedGoal] = useState(null);
 
-            setGoals(
-                Array.isArray(res.data)
-                    ? res.data
-                    : []
-            );
-        } catch (error) {
-            toast.error("Failed to load goals");
-        } finally {
-            setLoading(false);
-        }
-    };
+  const [historyOpen, setHistoryOpen] = useState(false);
 
-    useEffect(() => {
-        fetchGoals();
-    }, []);
+  const [historyGoal, setHistoryGoal] = useState(null);
 
-    const editGoal = (goal) => {
-        setSelectedGoal(goal);
-        setEditModalOpen(true);
-    };
+  const fetchGoals = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const addMoney = (goal) => {
-        setSelectedGoal(goal);
-        setMoneyModalOpen(true);
-    };
+      const res = await API.get("/goals", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const deleteGoal = async (id) => {
-        if (
-            !window.confirm(
-                "Delete this goal?"
-            )
-        )
-            return;
+      setGoals(
+        Array.isArray(res.data)
+          ? res.data
+          : []
+      );
+    } catch (error) {
+      toast.error("Failed to load goals");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        try {
-            const token = localStorage.getItem("token");
+  useEffect(() => {
+    fetchGoals();
+  }, []);
 
-            await API.delete(`/goals/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+  const editGoal = (goal) => {
+    setSelectedGoal(goal);
+    setEditModalOpen(true);
+  };
 
-            toast.success(
-                "Goal Deleted Successfully"
-            );
+  const addMoney = (goal) => {
+    setSelectedGoal(goal);
+    setMoneyModalOpen(true);
+  };
 
+  const deleteGoal = async (id) => {
+    if (!window.confirm(t("confirmDeleteGoal"))) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.delete(`/goals/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success(
+        t("goalDeletedSuccessfully")
+      );
+
+      fetchGoals();
+      refreshData();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          t("deleteFailed")
+      );
+    }
+  };
+
+  const showHistory = (goal) => {
+    setHistoryGoal(goal);
+    setHistoryOpen(true);
+  };
+
+  return (
+    <AppLayout>
+      <div className="mx-auto max-w-7xl px-2 sm:px-0">
+
+        {/* HEADER */}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800 break-words sm:text-4xl">
+              🎯 {t("goals")}
+            </h1>
+
+            <p className="mt-1 text-slate-500">
+              {t("trackFinancialGoals")}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setOpenModal(true)}
+            className="w-full rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-600 sm:w-auto"
+          >
+            + {t("addGoal")}
+          </button>
+
+        </div>
+
+        {/* LOADING */}
+        {loading && (
+          <div className="py-20 text-center text-slate-500">
+            {t("loadingGoals")}
+          </div>
+        )}
+
+        {/* NO GOALS */}
+        {!loading && goals.length === 0 && (
+          <div className="rounded-2xl bg-white p-12 text-center shadow">
+
+            <h2 className="text-2xl font-bold text-slate-700">
+              {t("noGoalsYet")} 🎯
+            </h2>
+
+            <p className="mt-3 text-slate-500">
+              {t("createFirstSavingsGoal")}
+            </p>
+
+          </div>
+        )}
+
+        {/* GOALS */}
+        {!loading && goals.length > 0 && (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+
+            {goals.map((goal) => (
+              <GoalCard
+                key={goal.id}
+                goal={goal}
+                onEdit={editGoal}
+                onDelete={deleteGoal}
+                onAddMoney={addMoney}
+                onHistory={showHistory}
+              />
+            ))}
+
+          </div>
+        )}
+
+        {/* ADD GOAL MODAL */}
+        <AddGoalModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          onSuccess={() => {
             fetchGoals();
-        } catch (error) {
-            toast.error(
-                error.response?.data?.message ||
-                "Delete Failed"
-            );
-        }
-    };
+            setOpenModal(false);
+          }}
+        />
 
-    return (
-        <AppLayout>
-            <div className="max-w-7xl mx-auto">
+        {/* EDIT GOAL MODAL */}
+        <EditGoalModal
+          open={editModalOpen}
+          goal={selectedGoal}
+          onClose={() => {
+            setEditModalOpen(false);
+            setSelectedGoal(null);
+          }}
+          onSuccess={() => {
+            fetchGoals();
+            setEditModalOpen(false);
+            setSelectedGoal(null);
+          }}
+        />
 
-                <div className="mb-8 flex items-center justify-between">
+        {/* ADD MONEY MODAL */}
+        <AddMoneyModal
+          open={moneyModalOpen}
+          goal={selectedGoal}
+          onClose={() => {
+            setMoneyModalOpen(false);
+            setSelectedGoal(null);
+          }}
+          onSuccess={() => {
+            fetchGoals();
+            setMoneyModalOpen(false);
+            setSelectedGoal(null);
+          }}
+        />
 
-                    <div>
+        {/* HISTORY MODAL */}
+        <GoalHistoryModal
+          open={historyOpen}
+          goal={historyGoal}
+          onClose={() => {
+            setHistoryOpen(false);
+            setHistoryGoal(null);
+          }}
+        />
 
-                        <h1 className="text-3xl font-bold text-slate-800">
-                            🎯 Savings Goals
-                        </h1>
-
-                        <p className="mt-1 text-slate-500">
-                            Track your financial goals
-                        </p>
-
-                    </div>
-
-                    <button
-                        onClick={() =>
-                            setOpenModal(true)
-                        }
-                        className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-600"
-                    >
-                        + Add Goal
-                    </button>
-
-                </div>
-
-                {loading && (
-                    <div className="py-20 text-center text-slate-500">
-                        Loading goals...
-                    </div>
-                )}
-
-                {!loading &&
-                    goals.length === 0 && (
-                        <div className="rounded-2xl bg-white p-12 text-center shadow">
-
-                            <h2 className="text-2xl font-bold text-slate-700">
-                                No Goals Yet 🎯
-                            </h2>
-
-                            <p className="mt-3 text-slate-500">
-                                Create your first savings
-                                goal.
-                            </p>
-
-                        </div>
-                    )}
-
-                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-
-                    {goals.map((goal) => (
-                        <GoalCard
-                            key={goal.id}
-                            goal={goal}
-                            onEdit={editGoal}
-                            onDelete={deleteGoal}
-                            onAddMoney={addMoney}
-                        />
-                    ))}
-
-                </div>
-
-                <AddGoalModal
-                    open={openModal}
-                    onClose={() => setOpenModal(false)}
-                    onSuccess={() => {
-                        fetchGoals();
-                        setOpenModal(false);
-                    }}
-                />
-
-                <EditGoalModal
-                    open={editModalOpen}
-                    goal={selectedGoal}
-                    onClose={() => {
-                        setEditModalOpen(false);
-                        setSelectedGoal(null);
-                    }}
-                    onSuccess={() => {
-                        fetchGoals();
-                        setEditModalOpen(false);
-                        setSelectedGoal(null);
-                    }}
-                />
-
-                <AddMoneyModal
-                    open={moneyModalOpen}
-                    goal={selectedGoal}
-                    onClose={() => {
-                        setMoneyModalOpen(false);
-                        setSelectedGoal(null);
-                    }}
-                    onSuccess={() => {
-                        fetchGoals();
-                        setMoneyModalOpen(false);
-                        setSelectedGoal(null);
-                    }}
-                />
-
-            </div>
-        </AppLayout>
-    );
+      </div>
+    </AppLayout>
+  );
 }
 
 export default Goals;

@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const { notifyUser } = require("../socket");
 
 // Save Budget
 const saveBudget = (req, res) => {
@@ -39,6 +40,8 @@ const saveBudget = (req, res) => {
               });
             }
 
+            notifyUser(user_id);
+
             return res.json({
               message: "Budget Updated Successfully",
             });
@@ -66,6 +69,8 @@ const saveBudget = (req, res) => {
                 message: "Insert Failed",
               });
             }
+
+            notifyUser(user_id);
 
             res.status(201).json({
               message: "Budget Saved Successfully",
@@ -97,7 +102,72 @@ const getBudgets = (req, res) => {
   });
 };
 
+
+// Update Budget
+const updateBudget = (req, res) => {
+  const { monthly_budget } = req.body;
+
+  const sql = `
+    UPDATE budgets
+    SET monthly_budget=?
+    WHERE id=? AND user_id=?
+  `;
+
+  db.query(
+    sql,
+    [
+      monthly_budget,
+      req.params.id,
+      req.user.id,
+    ],
+    (err) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Update Failed",
+        });
+      }
+
+      notifyUser(req.user.id);
+
+      res.json({
+        message: "Budget Updated Successfully",
+      });
+    }
+  );
+};
+
+// Delete Budget
+const deleteBudget = (req, res) => {
+  const sql = `
+    DELETE FROM budgets
+    WHERE id=? AND user_id=?
+  `;
+
+  db.query(
+    sql,
+    [
+      req.params.id,
+      req.user.id,
+    ],
+    (err) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Delete Failed",
+        });
+      }
+
+      notifyUser(req.user.id);
+
+      res.json({
+        message: "Budget Deleted Successfully",
+      });
+    }
+  );
+};
+
 module.exports = {
   saveBudget,
   getBudgets,
+  updateBudget,
+  deleteBudget,
 };

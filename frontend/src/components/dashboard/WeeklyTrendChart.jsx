@@ -60,7 +60,7 @@ function WeeklyTrendChart({ expenses = [] }) {
 
       ) : (
 
-        <div className="h-72 w-full sm:h-80">
+        <div className="h-[250px] sm:h-[300px] lg:h-72 w-full">
 
           <ResponsiveContainer width="100%" height="100%">
 

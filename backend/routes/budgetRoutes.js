@@ -1,21 +1,22 @@
 const express = require("express");
+
 const router = express.Router();
 
-const verifyToken = require("../middleware/authMiddleware");
-const budgetController = require("../controllers/budgetController");
+const {
+  saveBudget,
+  getBudgets,
+  updateBudget,
+  deleteBudget,
+} = require("../controllers/budgetController");
 
-// Save / Update Budget
-router.post(
-  "/budgets",
-  verifyToken,
-  budgetController.saveBudget
-);
+const auth = require("../middleware/authMiddleware");
 
-// Get All Budgets
-router.get(
-  "/budgets",
-  verifyToken,
-  budgetController.getBudgets
-);
+router.post("/", auth, saveBudget);
+
+router.get("/", auth, getBudgets);
+
+router.put("/:id", auth, updateBudget);
+
+router.delete("/:id", auth, deleteBudget);
 
 module.exports = router;

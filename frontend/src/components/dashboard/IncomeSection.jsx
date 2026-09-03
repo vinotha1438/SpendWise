@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import IncomeTable from "../transaction/IncomeTable";
 
 function IncomeSection({
@@ -5,32 +6,30 @@ function IncomeSection({
   onEdit,
   onDelete,
 }) {
+  const { t } = useTranslation();
+
   return (
-    <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+    <section className="mb-8">
 
-      <div className="mb-6">
-
-        <h2 className="text-2xl font-bold text-slate-800">
-          Income History
+      <div className="mb-6 flex flex-col gap-2">
+        <h2 className="text-2xl font-bold text-foreground">
+          {t("incomeHistory")}
         </h2>
 
-        <p className="mt-1 text-sm text-slate-500">
-          View, manage and edit all your income records.
+        <p className="text-sm text-muted-foreground">
+          {t("viewManageEditIncome")}
         </p>
-
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
-
+      <div className="overflow-x-auto rounded-2xl border border-border">
         <IncomeTable
           income={income}
           onEdit={onEdit}
           onDelete={onDelete}
         />
-
       </div>
 
-    </div>
+    </section>
   );
 }
 

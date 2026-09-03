@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import { useTranslation } from "react-i18next";
 
 import AppLayout from "../components/layout/AppLayout";
 import RecurringForm from "../components/recurring/RecurringForm";
 import RecurringTable from "../components/recurring/RecurringTable";
 
 function RecurringExpenses() {
-  const [recurringExpenses, setRecurringExpenses] = useState([]);
+  const { t } = useTranslation();
+
+  const [recurringExpenses, setRecurringExpenses] =
+    useState([]);
 
   const [showForm, setShowForm] = useState(false);
 
@@ -43,7 +47,7 @@ function RecurringExpenses() {
   const handleDelete = async (id) => {
     if (
       !window.confirm(
-        "Delete this recurring expense?"
+        t("confirmDeleteRecurring")
       )
     ) {
       return;
@@ -65,7 +69,7 @@ function RecurringExpenses() {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-          "Delete Failed"
+          t("deleteFailed")
       );
     }
   };
@@ -77,21 +81,18 @@ function RecurringExpenses() {
 
   return (
     <AppLayout>
-      <div className="p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
 
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
           <div>
-
-            <h1 className="text-3xl font-bold text-slate-800">
-              🔁 Recurring Expenses
+            <h1 className="break-words text-3xl font-bold text-slate-800 sm:text-4xl">
+              🔁 {t("recurringExpenses")}
             </h1>
 
-            <p className="text-slate-500 mt-2">
-              Manage your monthly and yearly
-              recurring expenses.
+            <p className="mt-2 text-slate-500">
+              {t("manageRecurringExpenses")}
             </p>
-
           </div>
 
           <button
@@ -99,15 +100,15 @@ function RecurringExpenses() {
               setEditingExpense(null);
               setShowForm(true);
             }}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+            className="w-full rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white transition hover:bg-emerald-700 sm:w-auto"
           >
-            + Add Recurring Expense
+            + {t("addRecurringExpense")}
           </button>
 
         </div>
 
         {showForm && (
-          <div className="mb-8">
+          <div className="mb-8 overflow-hidden rounded-2xl">
 
             <RecurringForm
               recurringExpense={editingExpense}

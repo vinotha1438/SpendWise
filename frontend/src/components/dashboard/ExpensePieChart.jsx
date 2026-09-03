@@ -33,39 +33,89 @@ function ExpensePieChart({ expenses = [] }) {
     value: categoryMap[category],
   }));
 
+  const totalExpense = data.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
+
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
-      <h2 className="mb-5 text-xl font-bold text-slate-800">
-        🥧 Expense by Category
-      </h2>
+    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
-      <div className="h-80 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="value"
-              nameKey="name"
-              outerRadius={100}
-              label
-            >
-              {data.map((item, index) => (
-                <Cell
-                  key={index}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
+      <div className="mb-6">
 
-            <Tooltip />
+        <h2 className="text-xl font-bold text-slate-800">
+          🥧 Expense by Category
+        </h2>
 
-            <Legend
-              verticalAlign="bottom"
-              height={36}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+        <p className="mt-1 text-sm text-slate-500">
+          Category-wise expense distribution.
+        </p>
+
       </div>
+
+      {data.length === 0 ? (
+
+        <div className="flex h-72 items-center justify-center text-slate-500 sm:h-80">
+          No expense data available.
+        </div>
+
+      ) : (
+
+        <>
+          <div className="h-72 w-full sm:h-80">
+
+            <ResponsiveContainer width="100%" height="100%">
+
+              <PieChart>
+
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={100}
+                  label={({ percent }) =>
+                    `${(percent * 100).toFixed(0)}%`
+                  }
+                >
+                  {data.map((item, index) => (
+                    <Cell
+                      key={item.name}
+                      fill={
+                        COLORS[index % COLORS.length]
+                      }
+                    />
+                  ))}
+                </Pie>
+
+                <Tooltip
+                  formatter={(value) => [
+                    `₹${Number(value).toLocaleString(
+                      "en-IN"
+                    )}`,
+                    "Amount",
+                  ]}
+                />
+
+                <Legend
+                  verticalAlign="bottom"
+                />
+
+              </PieChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+          <p className="mt-4 text-center text-sm text-slate-500">
+            Total Expense{" "}
+            <span className="font-semibold text-slate-700">
+              ₹{totalExpense.toLocaleString("en-IN")}
+            </span>
+          </p>
+        </>
+
+      )}
+
     </div>
   );
 }

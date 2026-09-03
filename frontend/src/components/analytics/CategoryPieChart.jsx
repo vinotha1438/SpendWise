@@ -1,106 +1,94 @@
-import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-} from "recharts";
-
-const COLORS = [
-  "#22C55E",
-  "#3B82F6",
-  "#F59E0B",
-  "#EF4444",
-  "#8B5CF6",
-  "#14B8A6",
-  "#EC4899",
-];
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 function CategoryPieChart({ expenses = [] }) {
-  const categoryData = {};
+  const categoryTotals = {};
 
   expenses.forEach((item) => {
     const category = item.category || "Others";
+    const amount = Number(item.amount || 0);
 
-    categoryData[category] =
-      (categoryData[category] || 0) +
-      Number(item.amount || 0);
+    categoryTotals[category] =
+      (categoryTotals[category] || 0) + amount;
   });
 
-  const data = Object.entries(categoryData).map(
-    ([name, value]) => ({
+  const data = Object.entries(categoryTotals)
+    .map(([name, value]) => ({
       name,
       value,
-    })
-  );
+    }))
+    .sort((a, b) => b.value - a.value);
 
-  const totalExpense = data.reduce(
-    (sum, item) => sum + item.value,
-    0
-  );
+  const COLORS = [
+    "#10B981",
+    "#3B82F6",
+    "#F59E0B",
+    "#EF4444",
+    "#8B5CF6",
+    "#EC4899",
+    "#14B8A6",
+    "#F97316",
+    "#6366F1",
+    "#64748B",
+  ];
+
+  if (data.length === 0) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-800">
+          💰 Expense by Category
+        </h2>
+
+        <div className="flex min-h-[320px] items-center justify-center text-slate-500">
+          No expense data available.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-slate-800">
+          💰 Expense by Category
+        </h2>
 
-      <h2 className="mb-6 text-xl font-bold text-slate-800">
-        🥧 Expense by Category
-      </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          See where your money is being spent.
+        </p>
+      </div>
 
-      {data.length === 0 ? (
-        <div className="flex h-[350px] items-center justify-center text-slate-500">
-          No expense data available.
-        </div>
-      ) : (
-        <ResponsiveContainer
-          width="100%"
-          height={350}
-        >
+      <div className="h-[320px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-
             <Pie
               data={data}
               dataKey="value"
               nameKey="name"
-              outerRadius={110}
-              label={({ percent }) =>
-                `${(percent * 100).toFixed(0)}%`
+              cx="50%"
+              cy="50%"
+              outerRadius={105}
+              innerRadius={55}
+              paddingAngle={2}
+              label={({ name, percent }) =>
+                `${name} ${(percent * 100).toFixed(0)}%`
               }
             >
               {data.map((entry, index) => (
                 <Cell
-                  key={entry.name}
-                  fill={
-                    COLORS[index % COLORS.length]
-                  }
+                  key={`cell-${entry.name}`}
+                  fill={COLORS[index % COLORS.length]}
                 />
               ))}
             </Pie>
 
             <Tooltip
-              formatter={(value) => [
-                `₹${Number(value).toLocaleString(
-                  "en-IN"
-                )}`,
-                "Amount",
-              ]}
+              formatter={(value) =>
+                `₹${Number(value).toLocaleString("en-IN")}`
+              }
             />
-
-            <Legend verticalAlign="bottom" />
-
           </PieChart>
         </ResponsiveContainer>
-      )}
-
-      {data.length > 0 && (
-        <p className="mt-4 text-center text-sm text-slate-500">
-          Total Expense:{" "}
-          <span className="font-semibold text-slate-700">
-            ₹{totalExpense.toLocaleString("en-IN")}
-          </span>
-        </p>
-      )}
-
+      </div>
     </div>
   );
 }

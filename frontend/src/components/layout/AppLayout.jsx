@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useData } from "../../context/DataContext";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
@@ -7,8 +7,20 @@ function AppLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { balance } = useData();
 
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-background text-foreground transition-colors">
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
@@ -16,9 +28,10 @@ function AppLayout({ children }) {
       />
 
       <div
-        className="min-h-screen transition-all duration-300"
+        className="min-h-screen"
         style={{
-          marginLeft: window.innerWidth >= 1024 ? "256px" : "0px",
+          marginLeft: isDesktop ? "256px" : "0px",
+          transition: "margin-left 0.3s",
         }}
       >
         <Navbar
@@ -26,7 +39,7 @@ function AppLayout({ children }) {
           setSidebarOpen={setSidebarOpen}
         />
 
-        <main className="p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+        <main className="bg-background p-4 text-foreground transition-colors sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

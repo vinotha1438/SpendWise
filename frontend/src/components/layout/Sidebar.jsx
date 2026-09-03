@@ -1,4 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 function Sidebar({
   sidebarOpen,
@@ -6,45 +8,57 @@ function Sidebar({
   balance = 0,
 }) {
   const location = useLocation();
+  const { darkMode } = useTheme();
+  const { t } = useTranslation();
 
   const menu = [
     {
-      name: "Dashboard",
+      name: t("dashboard"),
       path: "/dashboard",
       icon: "🏠",
     },
     {
-      name: "Income",
+      name: t("income"),
       path: "/income",
       icon: "💰",
     },
     {
-      name: "Budget Planner",
+      name: t("accounts"),
+      path: "/accounts",
+      icon: "🏦",
+    },
+    {
+      name: t("budgetPlanner"),
       path: "/budget",
       icon: "📅",
     },
     {
-      name: "Recurring Expenses",
+      name: t("recurringExpenses"),
       path: "/recurring-expenses",
       icon: "🔁",
     },
     {
-      name: "Goals",
+      name: t("goals"),
       path: "/goals",
       icon: "🎯",
     },
     {
-      name: "Analytics",
+      name: t("analytics"),
       path: "/analytics",
       icon: "📊",
     },
     {
-      name: "Reports",
+      name: t("reports"),
       path: "/reports",
       icon: "📄",
     },
     {
-      name: "Settings",
+      name: t("financialHealth"),
+      path: "/financial-health",
+      icon: "❤️",
+    },
+    {
+      name: t("settings"),
       path: "/settings",
       icon: "⚙️",
     },
@@ -54,73 +68,101 @@ function Sidebar({
     <>
       <aside
         className={`
-        fixed
-        top-0
-        left-0
-        z-50
-        h-screen
-        w-64
-        bg-slate-900
-        text-white
-        flex
-        flex-col
-        justify-between
-        overflow-y-auto
-        transition-transform
-        duration-300
-        ${sidebarOpen
-            ? "translate-x-0"
-            : "-translate-x-full"
+          fixed
+          top-0
+          left-0
+          z-50
+          h-screen
+          w-64
+          flex
+          flex-col
+          justify-between
+          overflow-y-auto
+          transition-transform
+          duration-300
+          ${
+            darkMode
+              ? "bg-slate-950 text-white"
+              : "bg-slate-900 text-white"
           }
-        lg:translate-x-0
-      `}
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+          }
+          lg:translate-x-0
+        `}
       >
         <div>
-          <div className="p-6 border-b border-slate-800">
-            <h2 className="text-2xl font-bold text-emerald-400">
-              💰 SpendWise
-            </h2>
+          {/* LOGO */}
+          <div className="border-b border-slate-700 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-emerald-400">
+                  💰 SpendWise
+                </h2>
 
-            <p className="text-slate-400 text-sm mt-1">
-              Personal Finance
-            </p>
+                <p className="mt-1 text-sm text-slate-400">
+                  {t("personalFinance")}
+                </p>
+              </div>
+            </div>
           </div>
 
+          {/* MENU */}
           <nav className="p-4">
             {menu.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 mb-2 transition-all ${location.pathname === item.path
-                  ? "bg-emerald-500 text-white"
-                  : "text-slate-300 hover:bg-slate-800"
-                  }`}
+                className={`
+                  mb-2
+                  flex
+                  items-center
+                  gap-3
+                  rounded-xl
+                  px-4
+                  py-3
+                  transition-all
+                  ${
+                    location.pathname === item.path
+                      ? "bg-emerald-500 text-white shadow-lg"
+                      : "text-slate-300 hover:bg-slate-800"
+                  }
+                `}
               >
-                <span>{item.icon}</span>
-                <span>{item.name}</span>
+                <span className="text-lg">
+                  {item.icon}
+                </span>
+
+                <span className="font-medium">
+                  {item.name}
+                </span>
               </Link>
             ))}
           </nav>
         </div>
 
-        <div className="p-5 border-t border-slate-800">
-          <div className="rounded-xl bg-slate-800 p-5">
-            <p className="text-slate-400 text-sm">
-              Current Balance
+        {/* BALANCE */}
+        <div className="border-t border-slate-700 p-5">
+          <div className="rounded-2xl bg-slate-800 p-5">
+            <p className="text-sm text-slate-400">
+              {t("currentBalance")}
             </p>
 
             <h2
-              className={`text-3xl font-bold mt-2 ${balance >= 0
-                ? "text-emerald-400"
-                : "text-red-400"
-                }`}
+              className={`mt-2 text-3xl font-bold ${
+                balance >= 0
+                  ? "text-emerald-400"
+                  : "text-red-400"
+              }`}
             >
               ₹{balance.toLocaleString("en-IN")}
             </h2>
 
-            <p className="text-xs text-slate-500 mt-2">
-              Live Balance
+            <p className="mt-2 text-xs text-slate-500">
+              {t("liveBalance")}
             </p>
           </div>
         </div>

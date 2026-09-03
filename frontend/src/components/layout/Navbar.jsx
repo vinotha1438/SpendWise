@@ -1,94 +1,133 @@
-import { Bell, Menu, Search, User } from "lucide-react";
+import {
+  Menu,
+  Search,
+  User,
+  Moon,
+  Sun,
+} from "lucide-react";
+
+import { useTheme } from "../../context/ThemeContext";
+import { useTranslation } from "react-i18next";
+import NotificationBell from "../notifications/NotificationBell";
 
 function Navbar({ sidebarOpen, setSidebarOpen }) {
+  const { darkMode, toggleTheme } = useTheme();
+  const { t, i18n } = useTranslation();
+
   const hour = new Date().getHours();
 
   let greeting = "Good Evening 🌙";
 
-  if (hour < 12) greeting = "Good Morning ☀️";
-  else if (hour < 17) greeting = "Good Afternoon 🌤️";
+  if (hour < 12) {
+    greeting = "Good Morning ☀️";
+  } else if (hour < 17) {
+    greeting = "Good Afternoon 🌤️";
+  }
+
+  const currentLanguage =
+    i18n?.resolvedLanguage || i18n?.language || "en";
+
+  const changeLanguage = (language) => {
+    if (i18n && typeof i18n.changeLanguage === "function") {
+      i18n.changeLanguage(language);
+    }
+  };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
-      {/* Left */}
+    <header className="flex w-full items-center justify-between px-4 py-4 sm:px-6">
+      
+      {/* LEFT */}
       <div className="flex items-center gap-4">
-
-        {/* Mobile Menu */}
         <button
-          className="lg:hidden text-slate-700"
+          className="text-foreground lg:hidden"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           <Menu size={26} />
         </button>
 
         <div>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             {greeting}
           </p>
 
-          <h2 className="text-2xl font-bold text-slate-800">
-            Dashboard
+          <h2 className="text-2xl font-bold text-foreground">
+            {t("dashboard")}
           </h2>
         </div>
-
       </div>
 
-      {/* Right */}
-      <div className="flex items-center gap-5">
+      {/* RIGHT */}
+      <div className="flex items-center gap-3 sm:gap-5">
 
-        {/* Search */}
-        <div className="hidden lg:flex items-center w-64 rounded-xl bg-slate-100 px-3 py-2">
-
+        {/* SEARCH */}
+        <div className="hidden items-center rounded-xl bg-muted px-3 py-2 lg:flex lg:w-64">
           <Search
             size={18}
-            className="text-slate-500"
+            className="text-muted-foreground"
           />
 
           <input
             type="text"
-            placeholder="Search expenses..."
-            className="bg-transparent outline-none ml-3 w-full text-slate-700 placeholder:text-slate-400"
+            placeholder={t("search")}
+            className="ml-3 w-full bg-transparent text-foreground outline-none placeholder:text-muted-foreground"
           />
-
         </div>
 
-        {/* Notification */}
+        {/* LANGUAGE */}
+        <select
+          value={
+            currentLanguage.startsWith("ta")
+              ? "ta"
+              : "en"
+          }
+          onChange={(e) =>
+            changeLanguage(e.target.value)
+          }
+          className="rounded-xl bg-muted px-3 py-2 text-sm font-medium text-foreground outline-none"
+        >
+          <option value="en">English</option>
+          <option value="ta">தமிழ்</option>
+        </select>
 
-        <button className="relative p-3 rounded-xl bg-slate-100 hover:bg-slate-200 transition">
-
-          <Bell
-            size={20}
-            className="text-slate-700"
-          />
-
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500"></span>
-
+        {/* THEME */}
+        <button
+          onClick={toggleTheme}
+          className="rounded-xl bg-muted p-3 transition hover:opacity-80"
+        >
+          {darkMode ? (
+            <Sun
+              size={20}
+              className="text-yellow-500"
+            />
+          ) : (
+            <Moon
+              size={20}
+              className="text-foreground"
+            />
+          )}
         </button>
 
-        {/* Profile */}
+        {/* NOTIFICATION */}
+        <NotificationBell />
 
+        {/* PROFILE */}
         <div className="flex items-center gap-3">
-
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white">
             <User size={20} />
           </div>
 
           <div className="hidden md:block">
-
-            <p className="font-semibold text-slate-800">
+            <p className="font-semibold text-foreground">
               Welcome
             </p>
 
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               SpendWise User
             </p>
-
           </div>
-
         </div>
 
       </div>
-
     </header>
   );
 }

@@ -1,11 +1,18 @@
+import { useEffect } from "react";
 import { useData } from "../context/DataContext";
 
 import AppLayout from "../components/layout/AppLayout";
 import ExportPDF from "../components/reports/ExportPDF";
 import ExportExcel from "../components/reports/ExportExcel";
+import { GitCommitVertical } from "lucide-react";
 
 function Reports() {
-  const { expenses, income } = useData();
+  const { expenses, income, totalBalance, refreshData } = useData();
+
+  // Refresh on mount in case this page is opened directly.
+  useEffect(() => {
+    refreshData();
+  }, []);
 
   const totalExpense = expenses.reduce(
     (sum, item) => sum + Number(item.amount || 0),
@@ -17,6 +24,11 @@ function Reports() {
     0
   );
 
+  // Net Balance = income vs expense for the transactions shown here.
+  // This is intentionally different from Total Balance below, which
+  // is the actual accounts-derived balance (includes opening
+  // balances). Two different, both-legitimate numbers — kept
+  // clearly separate rather than conflated into one "balance".
   const netBalance = totalIncome - totalExpense;
 
   const totalTransactions =
@@ -27,9 +39,9 @@ function Reports() {
       expenses={expenses}
       income={income}
     >
-      <div className="p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
           <div>
 
@@ -43,7 +55,7 @@ function Reports() {
 
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:w-auto">
 
             <ExportPDF
               expenses={expenses}
@@ -59,7 +71,7 @@ function Reports() {
 
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-5">
 
           <div className="rounded-2xl border bg-white p-6 shadow-sm">
 
@@ -67,7 +79,7 @@ function Reports() {
               Total Expense
             </p>
 
-            <h2 className="mt-3 text-3xl font-bold text-red-600">
+            <h2 className="mt-3 break-words text-3xl font-bold text-red-600">
               ₹{totalExpense.toLocaleString("en-IN")}
             </h2>
 
@@ -79,7 +91,7 @@ function Reports() {
               Total Income
             </p>
 
-            <h2 className="mt-3 text-3xl font-bold text-emerald-600">
+            <h2 className="mt-3 break-words text-3xl font-bold text-emerald-600">
               ₹{totalIncome.toLocaleString("en-IN")}
             </h2>
 
@@ -92,13 +104,24 @@ function Reports() {
             </p>
 
             <h2
-              className={`mt-3 text-3xl font-bold ${
-                netBalance >= 0
-                  ? "text-blue-600"
-                  : "text-red-600"
-              }`}
+              className={`mt-3 break-words text-3xl font-bold ${netBalance >= 0
+                ? "text-blue-600"
+                : "text-red-600"
+                }`}
             >
               ₹{netBalance.toLocaleString("en-IN")}
+            </h2>
+
+          </div>
+
+          <div className="rounded-2xl border bg-white p-6 shadow-sm">
+
+            <p className="text-slate-500">
+              Total Balance
+            </p>
+
+            <h2 className="mt-3 break-words text-3xl font-bold text-indigo-600">
+              ₹{totalBalance.toLocaleString("en-IN")}
             </h2>
 
           </div>
@@ -127,9 +150,11 @@ function Reports() {
 
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Desktop Table */}
 
-            <table className="min-w-full">
+          <div className="hidden lg:block overflow-x-auto">
+
+            <table className="w-full">
 
               <thead className="bg-slate-100">
 
@@ -166,7 +191,7 @@ function Reports() {
                   <tr>
 
                     <td
-                      colSpan="5"
+                      colSpan={5}
                       className="py-10 text-center text-slate-500"
                     >
                       No Expense Records Found
@@ -188,14 +213,15 @@ function Reports() {
                       </td>
 
                       <td className="px-5 py-4">
-                        {item.category}
+
+                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          {item.category}
+                        </span>
+
                       </td>
 
-                      <td className="px-5 py-4 text-right font-semibold text-red-600">
-                        ₹
-                        {Number(item.amount).toLocaleString(
-                          "en-IN"
-                        )}
+                      <td className="px-5 py-4 text-right font-bold text-red-600">
+                        ₹{Number(item.amount).toLocaleString("en-IN")}
                       </td>
 
                       <td className="px-5 py-4">
@@ -204,11 +230,7 @@ function Reports() {
 
                       <td className="px-5 py-4">
                         {item.expense_date
-                          ? new Date(
-                              item.expense_date
-                            ).toLocaleDateString(
-                              "en-IN"
-                            )
+                          ? new Date(item.expense_date).toLocaleDateString("en-IN")
                           : "-"}
                       </td>
 
@@ -224,9 +246,69 @@ function Reports() {
 
           </div>
 
+          {/* Mobile Cards */}
+
+          <div className="space-y-4 p-4 lg:hidden">
+
+            {expenses.length === 0 ? (
+
+              <div className="py-10 text-center text-slate-500">
+                No Expense Records Found
+              </div>
+
+            ) : (
+
+              expenses.map((item) => (
+
+                <div
+                  key={item.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+
+                  <div className="flex items-center justify-between gap-3">
+
+                    <h3 className="font-bold text-slate-800 break-words">
+                      {item.title}
+                    </h3>
+
+                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                      {item.category}
+                    </span>
+
+                  </div>
+
+                  <div className="mt-4 space-y-2 text-sm">
+
+                    <p>
+                      <strong>Payment:</strong>{" "}
+                      {item.payment_method}
+                    </p>
+
+                    <p>
+                      <strong>Date:</strong>{" "}
+                      {item.expense_date
+                        ? new Date(item.expense_date).toLocaleDateString("en-IN")
+                        : "-"}
+                    </p>
+
+                    <p className="text-xl font-bold text-red-600">
+                      ₹{Number(item.amount).toLocaleString("en-IN")}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              ))
+
+            )}
+
+          </div>
+
         </div>
 
       </div>
+
     </AppLayout>
   );
 }

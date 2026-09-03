@@ -1,6 +1,7 @@
 import { useData } from "../context/DataContext";
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import { matchesDateFilter, sortTransactions } from "../utils/dateFilter";
 
 import AppLayout from "../components/layout/AppLayout";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
@@ -21,18 +22,23 @@ function Dashboard() {
   const {
     expenses,
     income,
+    totalBalance,
     refreshData,
   } = useData();
+
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortBy, setSortBy] = useState("Newest");
 
   const [editingExpense, setEditingExpense] = useState(null);
   const [showExpenseForm, setShowExpenseForm] = useState(false);
+
   const [dateFilter, setDateFilter] = useState("All");
+
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [editingIncome, setEditingIncome] = useState(null);
-  const [recurringExpenses, setRecurringExpenses] =
-    useState([]);
+
+  const [recurringExpenses, setRecurringExpenses] = useState([]);
 
   const fetchRecurringExpenses = async () => {
     try {
@@ -74,7 +80,10 @@ function Dashboard() {
 
       refreshData();
     } catch (error) {
-      alert(error.response?.data?.message || "Delete Failed");
+      alert(
+        error.response?.data?.message ||
+          "Delete Failed"
+      );
     }
   };
 
@@ -90,109 +99,98 @@ function Dashboard() {
 
       refreshData();
     } catch (error) {
-      alert(error.response?.data?.message || "Delete Failed");
+      alert(
+        error.response?.data?.message ||
+          "Delete Failed"
+      );
     }
   };
 
   const editExpense = (expense) => {
-    console.log("Editing Expense:", expense);
-    console.log(expense);
-
     setEditingExpense(expense);
     setShowExpenseForm(true);
   };
 
   const editIncome = (item) => {
-    console.log("Editing Income:", item);
-
     setEditingIncome(item);
     setShowIncomeForm(true);
   };
 
+  const openAddExpense = () => {
+    setEditingExpense(null);
+    setShowExpenseForm(true);
+  };
+
+  const openAddIncome = () => {
+    setEditingIncome(null);
+    setShowIncomeForm(true);
+  };
+
+  const closeExpenseForm = () => {
+    setShowExpenseForm(false);
+    setEditingExpense(null);
+  };
+
+  const closeIncomeForm = () => {
+    setShowIncomeForm(false);
+    setEditingIncome(null);
+  };
+
   const today = new Date();
 
-  const filteredExpenses = expenses.filter((expense) => {
-    const expenseDate = new Date(expense.expense_date);
+  const filteredExpenses = sortTransactions(
+    expenses.filter((expense) => {
+      const matchesSearch =
+        expense.title
+          ?.toLowerCase()
+          .includes(search.toLowerCase()) ||
+        expense.where_to_pay
+          ?.toLowerCase()
+          .includes(search.toLowerCase());
 
-    const matchesSearch = expense.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "" ||
+        expense.category === selectedCategory;
 
-    const matchesCategory =
-      selectedCategory === "" ||
-      expense.category === selectedCategory;
+      const matchesDate = matchesDateFilter(
+        expense.expense_date,
+        dateFilter
+      );
 
-    let matchesDate = true;
-
-    switch (dateFilter) {
-      case "Today":
-        matchesDate =
-          expenseDate.toDateString() === today.toDateString();
-        break;
-
-      case "This Week": {
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay());
-
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-        matchesDate =
-          expenseDate >= startOfWeek &&
-          expenseDate <= endOfWeek;
-        break;
-      }
-
-      case "This Month":
-        matchesDate =
-          expenseDate.getMonth() === today.getMonth() &&
-          expenseDate.getFullYear() === today.getFullYear();
-        break;
-
-      case "This Year":
-        matchesDate =
-          expenseDate.getFullYear() === today.getFullYear();
-        break;
-
-      default:
-        matchesDate = true;
-    }
-
-    return (
-      matchesSearch &&
-      matchesCategory &&
-      matchesDate
-    );
-  });
+      return matchesSearch && matchesCategory && matchesDate;
+    }),
+    sortBy,
+    "expense_date"
+  );
 
   return (
     <>
+      {/* Expense Form */}
       {showExpenseForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+
             <ExpenseForm
               expense={editingExpense}
-              isEdit={true}
+              isEdit={!!editingExpense}
               onSuccess={() => {
-                setShowExpenseForm(false);
-                setEditingExpense(null);
+                closeExpenseForm();
                 refreshData();
               }}
             />
 
             <button
-              onClick={() => {
-                setShowExpenseForm(false);
-                setEditingExpense(null);
-              }}
-              className="mt-4 w-full rounded-xl bg-slate-200 py-3 font-medium hover:bg-slate-300 transition"
+              onClick={closeExpenseForm}
+              className="mt-4 w-full rounded-xl bg-slate-200 py-3 font-medium transition hover:bg-slate-300"
             >
               Close
             </button>
+
           </div>
         </div>
       )}
 
+      {/* Income Form */}
       {showIncomeForm && (
         <AddIncomeModal
           open={showIncomeForm}
@@ -200,8 +198,7 @@ function Dashboard() {
           incomeToEdit={editingIncome}
           onSuccess={() => {
             refreshData();
-            setEditingIncome(null);
-            setShowIncomeForm(false);
+            closeIncomeForm();
           }}
         />
       )}
@@ -213,32 +210,89 @@ function Dashboard() {
 
         <DashboardHeader />
 
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Add Buttons */}
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+
+            <button
+              onClick={openAddExpense}
+              className="rounded-xl bg-red-500 px-5 py-3 font-semibold text-white transition hover:bg-red-600"
+            >
+              🧾 Add Expense
+            </button>
+
+            <button
+              onClick={openAddIncome}
+              className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white transition hover:bg-emerald-600"
+            >
+              💰 Add Income
+            </button>
+
+          </div>
+
+          {/* Date Filter */}
           <select
             value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="w-full sm:w-60 rounded-xl border border-slate-300 bg-white px-4 py-2 shadow-sm focus:border-emerald-500 focus:outline-none"
+            onChange={(e) =>
+              setDateFilter(e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-emerald-500 focus:outline-none sm:w-60"
           >
-            <option>All</option>
-            <option>Today</option>
-            <option>This Week</option>
-            <option>This Month</option>
-            <option>This Year</option>
+            <option value="All">All</option>
+            <option value="Today">Today</option>
+            <option value="This Week">
+              This Week
+            </option>
+            <option value="This Month">
+              This Month
+            </option>
+            <option value="This Year">
+              This Year
+            </option>
           </select>
+
+          {/* Sort */}
+          <select
+            value={sortBy}
+            onChange={(e) =>
+              setSortBy(e.target.value)
+            }
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-emerald-500 focus:outline-none sm:w-60"
+          >
+            <option value="Newest">Newest First</option>
+            <option value="Oldest">Oldest First</option>
+            <option value="Amount High-Low">
+              Amount: High to Low
+            </option>
+            <option value="Amount Low-High">
+              Amount: Low to High
+            </option>
+          </select>
+
         </div>
 
         <DashboardCards
           expenses={expenses}
           income={income}
+          totalBalance={totalBalance}
         />
 
-        <DailyAnalytics expenses={expenses} />
+        <DailyAnalytics
+          expenses={expenses}
+        />
 
-        <SpendingInsights expenses={expenses} />
+        <SpendingInsights
+          expenses={expenses}
+        />
 
-        <WeeklyTrendChart expenses={expenses} />
+        <WeeklyTrendChart
+          expenses={expenses}
+        />
 
-        <BudgetProgress expenses={expenses} />
+        <BudgetProgress
+          expenses={expenses}
+        />
 
         <UpcomingPayments
           recurringExpenses={recurringExpenses}
@@ -260,10 +314,18 @@ function Dashboard() {
           onEdit={editIncome}
         />
 
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ExpenseChart expenses={expenses} />
-          <ExpensePieChart expenses={expenses} />
+        <div className="mt-8 grid w-full grid-cols-1 gap-6 xl:grid-cols-2">
+
+          <ExpenseChart
+            expenses={expenses}
+          />
+
+          <ExpensePieChart
+            expenses={expenses}
+          />
+
         </div>
+
       </AppLayout>
     </>
   );

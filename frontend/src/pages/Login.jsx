@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Eye,
@@ -23,6 +23,112 @@ function Login() {
 
   const [loading, setLoading] = useState(false);
 
+  const googleButtonRef = useRef(null);
+
+  // If api.js bounced the user here because their token
+  // expired/was rejected, show them why instead of leaving
+  // them wondering why they were logged out.
+  useEffect(() => {
+    const message = sessionStorage.getItem(
+      "sessionExpiredMessage"
+    );
+
+    if (message) {
+      toast.error(message);
+      sessionStorage.removeItem("sessionExpiredMessage");
+    }
+  }, []);
+
+  const completeLogin = (token, message) => {
+    localStorage.setItem("token", token);
+
+    toast.success(message || "Login Successful");
+
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 800);
+  };
+
+  const handleGoogleResponse = async (response) => {
+    try {
+      const res = await API.post("/google-login", {
+        credential: response.credential,
+      });
+
+      completeLogin(res.data.token, res.data.message);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Google Sign-In Failed"
+      );
+    }
+  };
+
+  // The Google script (loaded via <script> in index.html) attaches
+  // itself to window.google asynchronously, so we poll briefly
+  // until it's ready rather than assuming it's there on mount.
+  //
+  // initializedRef guards against React StrictMode's dev-only
+  // double-invoke of effects, which would otherwise call
+  // google.accounts.id.initialize() twice and log a warning.
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    if (!clientId) {
+      console.log(
+        "VITE_GOOGLE_CLIENT_ID is not set — Google Sign-In button will not render."
+      );
+      return;
+    }
+
+    let attempts = 0;
+    let cancelled = false;
+
+    const tryRenderButton = () => {
+      if (cancelled) return;
+
+      attempts += 1;
+
+      if (window.google?.accounts?.id && googleButtonRef.current) {
+        if (!initializedRef.current) {
+          initializedRef.current = true;
+
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: handleGoogleResponse,
+          });
+        }
+
+        window.google.accounts.id.renderButton(
+          googleButtonRef.current,
+          {
+            theme: "outline",
+            size: "large",
+            // Google's button API requires a fixed pixel width,
+            // not a percentage — 320 comfortably fills this form's
+            // input width without overflowing on small screens.
+            width: 320,
+            text: "continue_with",
+          }
+        );
+
+        return;
+      }
+
+      if (attempts < 50) {
+        setTimeout(tryRenderButton, 100);
+      }
+    };
+
+    tryRenderButton();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -39,18 +145,10 @@ function Login() {
         password,
       });
 
-      localStorage.setItem(
-        "token",
-        response.data.token
+      completeLogin(
+        response.data.token,
+        response.data.message
       );
-
-      toast.success(
-        response.data.message || "Login Successful"
-      );
-
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 800);
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -264,6 +362,17 @@ function Login() {
                 ? "Logging in..."
                 : "Login"}
             </button>
+
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span className="text-sm text-slate-400">OR</span>
+              <div className="h-px flex-1 bg-slate-200" />
+            </div>
+
+            <div
+              ref={googleButtonRef}
+              className="flex justify-center"
+            />
 
             <p className="text-center text-slate-500">
 

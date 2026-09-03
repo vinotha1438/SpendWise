@@ -1,22 +1,35 @@
 import { useEffect, useState } from "react";
 import API from "../../services/api";
+import { useTranslation } from "react-i18next";
 
-function BudgetForm({ onSuccess = () => {} }) {
+function BudgetForm({
+  budget: editingBudget,
+  isEdit = false,
+  onSuccess = () => {},
+}) {
+  const { t } = useTranslation();
+
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState("");
   const [budget, setBudget] = useState("");
 
-  const [showAddCategory, setShowAddCategory] =
-    useState(false);
-
-  const [newCategory, setNewCategory] =
-    useState("");
-
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
   const [icon, setIcon] = useState("📁");
 
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (editingBudget) {
+      setCategory(editingBudget.category);
+      setBudget(editingBudget.monthly_budget);
+    } else {
+      setCategory("");
+      setBudget("");
+    }
+  }, [editingBudget]);
 
   const fetchCategories = async () => {
     try {
@@ -29,9 +42,7 @@ function BudgetForm({ onSuccess = () => {} }) {
       });
 
       setCategories(
-        Array.isArray(response.data)
-          ? response.data
-          : []
+        Array.isArray(response.data) ? response.data : []
       );
     } catch (error) {
       console.log(error);
@@ -40,7 +51,7 @@ function BudgetForm({ onSuccess = () => {} }) {
 
   const saveCategory = async () => {
     if (!newCategory.trim()) {
-      alert("Enter Category Name");
+      alert(t("enterCategoryName"));
       return;
     }
 
@@ -67,42 +78,57 @@ function BudgetForm({ onSuccess = () => {} }) {
       setIcon("📁");
       setShowAddCategory(false);
 
-      alert("Category Added Successfully");
+      alert(t("categoryAddedSuccessfully"));
     } catch (error) {
       alert(
         error.response?.data?.message ||
-          "Failed to add category"
+          t("failedToAddCategory")
       );
     }
   };
 
   const saveBudget = async () => {
     if (!category || !budget) {
-      alert("Please fill all fields");
+      alert(t("pleaseFillAllFields"));
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
-
       const today = new Date();
 
-      await API.post(
-        "/budgets",
-        {
-          category,
-          monthly_budget: Number(budget),
-          month: today.getMonth() + 1,
-          year: today.getFullYear(),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      if (isEdit) {
+        await API.put(
+          `/api/budgets/${editingBudget.id}`,
+          {
+            monthly_budget: Number(budget),
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      alert("Budget Saved Successfully");
+        alert(t("budgetUpdatedSuccessfully"));
+      } else {
+        await API.post(
+          "/api/budgets",
+          {
+            category,
+            monthly_budget: Number(budget),
+            month: today.getMonth() + 1,
+            year: today.getFullYear(),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        alert(t("budgetSavedSuccessfully"));
+      }
 
       setCategory("");
       setBudget("");
@@ -111,27 +137,26 @@ function BudgetForm({ onSuccess = () => {} }) {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-          "Failed to save budget"
+          t("saveFailed")
       );
     }
   };
 
   return (
-    <div className="mb-6 rounded-2xl border bg-white p-6 shadow-sm">
-
-      <h2 className="mb-5 text-2xl font-bold">
-        Create Monthly Budget
+    <div>
+      <h2 className="mb-5 text-2xl font-bold text-slate-800 dark:text-slate-100">
+        {isEdit
+          ? t("updateBudget")
+          : t("createMonthlyBudget")}
       </h2>
 
       <select
-        className="mb-4 w-full rounded-xl border p-3"
+        className="mb-4 w-full rounded-xl border border-slate-300 bg-white p-3 text-slate-800 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
         value={category}
-        onChange={(e) =>
-          setCategory(e.target.value)
-        }
+        onChange={(e) => setCategory(e.target.value)}
       >
         <option value="">
-          Select Category
+          {t("selectCategory")}
         </option>
 
         {categories.map((item) => (
@@ -144,54 +169,54 @@ function BudgetForm({ onSuccess = () => {} }) {
         ))}
       </select>
 
-      <button
-        onClick={() =>
-          setShowAddCategory(
-            !showAddCategory
-          )
-        }
-        className="mb-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
-      >
-        + Add New Category
-      </button>
-
-      {showAddCategory && (
-        <div className="mb-4 rounded-xl border bg-slate-50 p-4">
-
-          <input
-            type="text"
-            placeholder="Category Name"
-            className="mb-3 w-full rounded-lg border p-3"
-            value={newCategory}
-            onChange={(e) =>
-              setNewCategory(e.target.value)
-            }
-          />
-
-          <input
-            type="text"
-            placeholder="Emoji (🍔)"
-            className="mb-3 w-full rounded-lg border p-3"
-            value={icon}
-            onChange={(e) =>
-              setIcon(e.target.value)
-            }
-          />
-
+      {!isEdit && (
+        <>
           <button
-            onClick={saveCategory}
-            className="rounded-lg bg-emerald-600 px-5 py-2 text-white"
+            onClick={() =>
+              setShowAddCategory(!showAddCategory)
+            }
+            className="mb-4 rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
           >
-            Save Category
+            + {t("addNewCategory")}
           </button>
 
-        </div>
+          {showAddCategory && (
+            <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+              <input
+                type="text"
+                placeholder={t("categoryName")}
+                className="mb-3 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-800 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                value={newCategory}
+                onChange={(e) =>
+                  setNewCategory(e.target.value)
+                }
+              />
+
+              <input
+                type="text"
+                placeholder={t("emoji")}
+                className="mb-3 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-800 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                value={icon}
+                onChange={(e) =>
+                  setIcon(e.target.value)
+                }
+              />
+
+              <button
+                onClick={saveCategory}
+                className="rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700"
+              >
+                {t("saveCategory")}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <input
         type="number"
-        placeholder="Monthly Budget"
-        className="mb-4 w-full rounded-xl border p-3"
+        placeholder={t("monthlyBudget")}
+        className="mb-4 w-full rounded-xl border border-slate-300 bg-white p-3 text-slate-800 placeholder-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
         value={budget}
         onChange={(e) =>
           setBudget(e.target.value)
@@ -202,9 +227,10 @@ function BudgetForm({ onSuccess = () => {} }) {
         onClick={saveBudget}
         className="w-full rounded-xl bg-emerald-600 p-3 font-semibold text-white hover:bg-emerald-700"
       >
-        Save Budget
+        {isEdit
+          ? t("updateBudget")
+          : t("saveBudget")}
       </button>
-
     </div>
   );
 }

@@ -20,8 +20,19 @@ i18n
 
     fallbackLng: "en",
 
+    supportedLngs: ["en", "ta"],
+
+    detection: {
+      order: ["localStorage", "navigator"],
+      caches: ["localStorage"],
+    },
+
     interpolation: {
       escapeValue: false,
+    },
+
+    react: {
+      useSuspense: false,
     },
   });
 

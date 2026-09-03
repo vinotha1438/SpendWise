@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import API from "../services/api";
+import { useEffect } from "react";
 
+import { useData } from "../context/DataContext";
 import AppLayout from "../components/layout/AppLayout";
 import HealthScoreCard from "../components/financialHealth/HealthScoreCard";
 import SavingsRateCard from "../components/financialHealth/SavingsRateCard";
@@ -9,44 +9,15 @@ import HealthGauge from "../components/financialHealth/HealthGauge";
 import Recommendations from "../components/financialHealth/Recommendations";
 
 function FinancialHealth() {
-  const [expenses, setExpenses] = useState([]);
-  const [income, setIncome] = useState([]);
+  // Same expenses/income arrays as Dashboard/Analytics/Reports —
+  // no more separate fetch of the same data on this page.
+  const { expenses, income, refreshData } = useData();
 
-  const fetchExpenses = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await API.get("/expenses", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setExpenses(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchIncome = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await API.get("/income", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setIncome(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+  // Refresh on mount in case this page is opened directly (e.g. via
+  // URL/refresh) without visiting Dashboard first — keeps this page
+  // from showing stale/empty data in that case.
   useEffect(() => {
-    fetchExpenses();
-    fetchIncome();
+    refreshData();
   }, []);
 
   return (
