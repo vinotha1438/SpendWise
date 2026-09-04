@@ -1,12 +1,3 @@
-jest.mock("../config/db", () => ({
-  getConnection: jest.fn(),
-  query: jest.fn(),
-}));
-
-jest.mock("../socket", () => ({
-  notifyUser: jest.fn(),
-}));
-
 const pool = require("../config/db");
 
 const {
