@@ -2,6 +2,11 @@
 
 A full-stack personal finance application with a strong focus on **data consistency** — every account balance, dashboard total, and report is derived from a single, correct source of truth instead of being recalculated differently on every page.
 
+🔗 **Live Demo:** [spend-wise-nine-roan.vercel.app](https://spend-wise-nine-roan.vercel.app/)
+📦 **Source Code:** this repository
+
+> Note: the backend runs on a free-tier server, so it may take 30–50 seconds to "wake up" if it hasn't been used recently. Please be patient on first load!
+
 ---
 
 ## ✨ Features
@@ -55,6 +60,18 @@ Real-time sync (Socket.io) means that when any of these operations happens on on
 **Database:** MySQL
 
 **Testing:** Jest (backend balance-logic unit tests)
+
+---
+
+## ☁️ Deployment
+
+| Layer | Service | Notes |
+|---|---|---|
+| Frontend | [Vercel](https://vercel.com) | Auto-deploys from `main` branch |
+| Backend | [Render](https://render.com) | Free-tier web service (spins down after inactivity) |
+| Database | [Aiven](https://aiven.io) | Free-tier managed MySQL, SSL required |
+
+All three run on free tiers, so this project costs $0/month to keep live.
 
 ---
 
@@ -112,22 +129,27 @@ Run the SQL files in `database/` against your MySQL instance to create the schem
 
 ### 3. Configure environment variables
 
-Create `D:\path\to\SpendWise\.env` (project root):
+Create `backend/.env`:
 
 ```
 PORT=3000
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_mysql_password
 DB_NAME=spendwise_db
+DB_SSL=false
 JWT_SECRET=a_long_random_string
 GOOGLE_CLIENT_ID=your_google_oauth_client_id
 ```
+
+> If connecting to a cloud MySQL provider that requires SSL (e.g. Aiven), set `DB_SSL=true` and use the host/port/credentials provided by your database dashboard.
 
 Create `frontend/.env`:
 
 ```
 VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
+VITE_API_URL=http://localhost:3000
 ```
 
 > Get a Google Client ID from [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials → Create OAuth Client ID (Web application). Add `http://localhost:5173` as an authorized JavaScript origin for local development.
