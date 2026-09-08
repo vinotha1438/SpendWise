@@ -129,7 +129,9 @@ function NotificationBell() {
         className="relative rounded-xl bg-muted p-3 hover:opacity-80"
       >
         <Bell
-          size={20}
+          size={22}
+          strokeWidth={2.25}
+          color="currentColor"
           className="text-foreground"
         />
 

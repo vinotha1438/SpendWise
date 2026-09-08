@@ -42,7 +42,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
           className="text-foreground lg:hidden"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
-          <Menu size={26} />
+          <Menu size={26} strokeWidth={2.25} color="currentColor" />
         </button>
 
         <div>
@@ -96,12 +96,15 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         >
           {darkMode ? (
             <Sun
-              size={20}
-              className="text-yellow-500"
+              size={22}
+              strokeWidth={2.25}
+              color="#eab308"
             />
           ) : (
             <Moon
-              size={20}
+              size={22}
+              strokeWidth={2.25}
+              color="currentColor"
               className="text-foreground"
             />
           )}
