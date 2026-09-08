@@ -66,6 +66,14 @@ function Sidebar({
 
   return (
     <>
+     {/* Backdrop — tapping outside the sidebar on mobile closes it */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <aside
         className={`
           fixed
