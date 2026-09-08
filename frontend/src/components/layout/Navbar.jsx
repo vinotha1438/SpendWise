@@ -34,12 +34,12 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
   };
 
   return (
-    <header className="flex w-full items-center justify-between px-4 py-4 sm:px-6">
+    <header className="flex w-full items-center justify-between gap-2 overflow-x-auto px-4 py-4 sm:px-6">
       
       {/* LEFT */}
       <div className="flex items-center gap-4">
         <button
-          className="text-foreground lg:hidden"
+          className="shrink-0 text-foreground lg:hidden"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           <Menu size={26} strokeWidth={2.25} color="currentColor" />
@@ -63,7 +63,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         <div className="hidden items-center rounded-xl bg-muted px-3 py-2 lg:flex lg:w-64">
           <Search
             size={18}
-            className="text-muted-foreground"
+            className="shrink-0 text-muted-foreground"
           />
 
           <input
@@ -83,7 +83,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
           onChange={(e) =>
             changeLanguage(e.target.value)
           }
-          className="rounded-xl bg-muted px-3 py-2 text-sm font-medium text-foreground outline-none"
+          className="shrink-0 rounded-xl bg-muted px-3 py-2 text-sm font-medium text-foreground outline-none"
         >
           <option value="en">English</option>
           <option value="ta">தமிழ்</option>
@@ -92,20 +92,21 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         {/* THEME */}
         <button
           onClick={toggleTheme}
-          className="rounded-xl bg-muted p-3 transition hover:opacity-80"
+          className="shrink-0 rounded-xl bg-muted p-3 transition hover:opacity-80"
         >
           {darkMode ? (
             <Sun
               size={22}
               strokeWidth={2.25}
               color="#eab308"
+              className="shrink-0"
             />
           ) : (
             <Moon
               size={22}
               strokeWidth={2.25}
               color="currentColor"
-              className="text-foreground"
+              className="shrink-0 text-foreground"
             />
           )}
         </button>
@@ -114,9 +115,9 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         <NotificationBell />
 
         {/* PROFILE */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white">
-            <User size={20} />
+        <div className="flex shrink-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+            <User size={20} className="shrink-0" />
           </div>
 
           <div className="hidden md:block">

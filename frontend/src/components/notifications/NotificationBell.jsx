@@ -121,29 +121,29 @@ function NotificationBell() {
 
   return (
     <div
-      className="relative"
+      className="relative shrink-0"
       ref={containerRef}
     >
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="relative rounded-xl bg-muted p-3 hover:opacity-80"
+        className="relative shrink-0 rounded-xl bg-muted p-3 hover:opacity-80"
       >
         <Bell
           size={22}
           strokeWidth={2.25}
           color="currentColor"
-          className="text-foreground"
+          className="shrink-0 text-foreground"
         />
 
         {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500 text-xs text-white">
             {unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-3 w-80 rounded-xl border border-border bg-card shadow-xl">
+        <div className="absolute right-0 z-50 mt-3 w-80 max-w-[90vw] rounded-xl border border-border bg-card shadow-xl">
 
           <div className="flex items-center justify-between border-b border-border p-4 font-bold text-card-foreground">
             <span>Notifications</span>
