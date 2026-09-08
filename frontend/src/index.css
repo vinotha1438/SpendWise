@@ -194,13 +194,16 @@ body,
 }
 
 img,
-svg,
 canvas,
 video {
   max-width: 100%;
   height: auto;
 }
 
+svg {
+  max-width: 100%;
+  flex-shrink: 0;
+}
 /* =====================================================
    GLOBAL DARK MODE FIX
    ===================================================== */
