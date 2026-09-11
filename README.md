@@ -195,3 +195,13 @@ npm test
 ## 📄 License
 
 This project is for personal/educational use.
+
+## 📱 Screenshots
+
+| Dashboard | Dark Mode | Expenses |
+|-----------|-----------|----------|
+| ![Dashboard](screenshots/WhatsApp%20Image%202026-09-11%20at%201.46.53%20PM.jpeg) | ![Dark](screenshots/WhatsApp%20Image%202026-09-11%20at%201.46.56%20PM.jpeg) | ![Expenses](screenshots/WhatsApp%20Image%202026-09-11%20at%201.27.02%20PM.jpeg) |
+
+| Analytics | Pie Chart |
+|-----------|-----------|
+| ![Analytics](screenshots/WhatsApp%20Image%202026-09-11%20at%201.46.50%20PM.jpeg) | ![Pie](screenshots/WhatsApp%20Image%202026-09-11%20at%203.31.13%20PM.jpeg) |
