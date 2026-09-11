@@ -27,16 +27,8 @@ function AddGoalModal({ open, onClose, onSuccess }) {
 
       await API.post(
         "/goals",
-        {
-          goal_name,
-          target_amount,
-          target_date,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { goal_name, target_amount, target_date },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       toast.success(t("goalCreatedSuccessfully"));
@@ -48,10 +40,7 @@ function AddGoalModal({ open, onClose, onSuccess }) {
       onSuccess();
       onClose();
     } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          t("failedToCreateGoal")
-      );
+      toast.error(error.response?.data?.message || t("failedToCreateGoal"));
     } finally {
       setLoading(false);
     }
@@ -59,26 +48,16 @@ function AddGoalModal({ open, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+        <h2 className="mb-6 text-2xl font-bold">🎯 {t("addSavingsGoal")}</h2>
 
-        <h2 className="mb-6 text-2xl font-bold">
-          🎯 {t("addSavingsGoal")}
-        </h2>
-
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4"
-        >
-
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             placeholder={t("goalName")}
             className="w-full rounded-xl border p-3"
             value={goal_name}
-            onChange={(e) =>
-              setGoalName(e.target.value)
-            }
+            onChange={(e) => setGoalName(e.target.value)}
           />
 
           <input
@@ -86,22 +65,29 @@ function AddGoalModal({ open, onClose, onSuccess }) {
             placeholder={t("targetAmount")}
             className="w-full rounded-xl border p-3"
             value={target_amount}
-            onChange={(e) =>
-              setTargetAmount(e.target.value)
-            }
+            onChange={(e) => setTargetAmount(e.target.value)}
           />
 
-          <input
-            type="date"
-            className="w-full rounded-xl border p-3"
-            value={target_date}
-            onChange={(e) =>
-              setTargetDate(e.target.value)
-            }
-          />
+          <div>
+            <label className="mb-1 block text-sm font-semibold">
+              {t("targetDate")}
+            </label>
+            <div className="relative">
+              <input
+                type="date"
+                className="w-full rounded-xl border p-3"
+                value={target_date}
+                onChange={(e) => setTargetDate(e.target.value)}
+              />
+              {!target_date && (
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                  dd-mm-yyyy
+                </span>
+              )}
+            </div>
+          </div>
 
           <div className="flex justify-end gap-3 pt-3">
-
             <button
               type="button"
               onClick={onClose}
@@ -115,17 +101,11 @@ function AddGoalModal({ open, onClose, onSuccess }) {
               disabled={loading}
               className="rounded-xl bg-emerald-500 px-5 py-2 text-white hover:bg-emerald-600"
             >
-              {loading
-                ? t("saving")
-                : t("saveGoal")}
+              {loading ? t("saving") : t("saveGoal")}
             </button>
-
           </div>
-
         </form>
-
       </div>
-
     </div>
   );
 }

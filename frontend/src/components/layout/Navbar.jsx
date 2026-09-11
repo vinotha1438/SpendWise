@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import { useTranslation } from "react-i18next";
 import NotificationBell from "../notifications/NotificationBell";
@@ -18,6 +18,23 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
   const { darkMode, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const pageTitles = {
+    "/dashboard": "dashboard",
+    "/income": "income",
+    "/accounts": "accounts",
+    "/goals": "goals",
+    "/analytics": "analytics",
+    "/reports": "reports",
+    "/financial-health": "financialHealth",
+    "/settings": "settings",
+    "/budget": "budgetPlanner",
+    "/recurring-expenses": "recurringExpenses",
+  };
+
+  const titleKey = pageTitles[location.pathname] || "dashboard";
 
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
@@ -90,7 +107,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
           </p>
 
           <h2 className="text-lg font-bold text-foreground sm:text-2xl">
-            {t("dashboard")}
+            {t(titleKey)}
           </h2>
         </div>
       </div>

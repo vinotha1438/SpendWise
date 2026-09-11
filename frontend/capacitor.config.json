@@ -1,0 +1,12 @@
+{
+  "appId": "com.spendwise.app",
+  "appName": "SpendWise",
+  "webDir": "dist",
+  "plugins": {
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "816329870960-ijffk5ma7ckhkohj80gbup58g23ktv8v.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    }
+  }
+}

@@ -151,6 +151,8 @@
   "date": "தேதி",
   "notes": "குறிப்புகள்",
   "expenseDate": "செலவு தேதி",
+  "nextDueDate": "அடுத்த தேதி",
+  "targetDate": "இலக்கு தேதி",
   "cash": "ரொக்கம்",
   "upi": "UPI",
   "card": "கார்டு",

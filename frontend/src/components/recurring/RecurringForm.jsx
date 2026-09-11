@@ -22,12 +22,8 @@ function RecurringForm({
       setTitle(recurringExpense.title || "");
       setCategory(recurringExpense.category || "");
       setAmount(recurringExpense.amount || "");
-      setPaymentMethod(
-        recurringExpense.payment_method || "Cash"
-      );
-      setFrequency(
-        recurringExpense.frequency || "Monthly"
-      );
+      setPaymentMethod(recurringExpense.payment_method || "Cash");
+      setFrequency(recurringExpense.frequency || "Monthly");
       setNextDueDate(
         recurringExpense.next_due_date
           ? recurringExpense.next_due_date.split("T")[0]
@@ -67,28 +63,14 @@ function RecurringForm({
       };
 
       if (isEdit) {
-        await API.put(
-          `/recurring-expenses/${recurringExpense.id}`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
+        await API.put(`/recurring-expenses/${recurringExpense.id}`, data, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         alert(t("recurringExpenseUpdatedSuccessfully"));
       } else {
-        await API.post(
-          "/recurring-expenses",
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
+        await API.post("/recurring-expenses", data, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         alert(t("recurringExpenseAddedSuccessfully"));
       }
 
@@ -96,10 +78,7 @@ function RecurringForm({
         onSuccess();
       }
     } catch (error) {
-      alert(
-        error.response?.data?.message ||
-          t("somethingWentWrong")
-      );
+      alert(error.response?.data?.message || t("somethingWentWrong"));
     }
   };
 
@@ -109,9 +88,7 @@ function RecurringForm({
       className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-lg"
     >
       <h2 className="text-2xl font-bold">
-        {isEdit
-          ? t("editRecurringExpense")
-          : t("addRecurringExpense")}
+        {isEdit ? t("editRecurringExpense") : t("addRecurringExpense")}
       </h2>
 
       <input
@@ -140,24 +117,18 @@ function RecurringForm({
 
       <select
         value={paymentMethod}
-        onChange={(e) =>
-          setPaymentMethod(e.target.value)
-        }
+        onChange={(e) => setPaymentMethod(e.target.value)}
         className="w-full rounded-xl border p-3"
       >
         <option value="Cash">{t("cash")}</option>
         <option value="UPI">{t("upi")}</option>
         <option value="Card">{t("card")}</option>
-        <option value="Bank Transfer">
-          {t("bankTransfer")}
-        </option>
+        <option value="Bank Transfer">{t("bankTransfer")}</option>
       </select>
 
       <select
         value={frequency}
-        onChange={(e) =>
-          setFrequency(e.target.value)
-        }
+        onChange={(e) => setFrequency(e.target.value)}
         className="w-full rounded-xl border p-3"
       >
         <option value="Weekly">{t("weekly")}</option>
@@ -165,14 +136,24 @@ function RecurringForm({
         <option value="Yearly">{t("yearly")}</option>
       </select>
 
-      <input
-        type="date"
-        value={nextDueDate}
-        onChange={(e) =>
-          setNextDueDate(e.target.value)
-        }
-        className="w-full rounded-xl border p-3"
-      />
+      <div>
+        <label className="mb-1 block text-sm font-medium text-slate-600">
+          {t("nextDueDate")}
+        </label>
+        <div className="relative">
+          <input
+            type="date"
+            value={nextDueDate}
+            onChange={(e) => setNextDueDate(e.target.value)}
+            className="w-full rounded-xl border p-3"
+          />
+          {!nextDueDate && (
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+              dd-mm-yyyy
+            </span>
+          )}
+        </div>
+      </div>
 
       <textarea
         placeholder={t("notes")}
@@ -186,9 +167,7 @@ function RecurringForm({
         type="submit"
         className="w-full rounded-xl bg-emerald-600 py-3 font-semibold text-white transition hover:bg-emerald-700"
       >
-        {isEdit
-          ? t("updateRecurringExpense")
-          : t("saveRecurringExpense")}
+        {isEdit ? t("updateRecurringExpense") : t("saveRecurringExpense")}
       </button>
     </form>
   );

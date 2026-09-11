@@ -78,14 +78,21 @@ function AnalyticsFilter({
               From Date
             </label>
 
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(e) =>
-                setFromDate(e.target.value)
-              }
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-            />
+            <div className="relative">
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(e) =>
+                  setFromDate(e.target.value)
+                }
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+              />
+              {!fromDate && (
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                  dd-mm-yyyy
+                </span>
+              )}
+            </div>
           </div>
 
           <div>
@@ -93,14 +100,21 @@ function AnalyticsFilter({
               To Date
             </label>
 
-            <input
-              type="date"
-              value={toDate}
-              onChange={(e) =>
-                setToDate(e.target.value)
-              }
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-            />
+            <div className="relative">
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e) =>
+                  setToDate(e.target.value)
+                }
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+              />
+              {!toDate && (
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                  dd-mm-yyyy
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-end">

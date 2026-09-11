@@ -141,6 +141,7 @@
   "addFirstRecurringExpense": "Add your first recurring expense.",
   "frequency": "Frequency",
   "nextDue": "Next Due",
+  "nextDueDate": "Next Due Date",
   "actions": "Actions",
 
   "notifications": "Notifications",
@@ -174,6 +175,8 @@
   "date": "Date",
   "notes": "Notes",
   "expenseDate": "Expense Date",
+  "nextDueDate": "Next Due Date",
+  "targetDate": "Target Date",
 
   "noExpensesFound": "No Expenses Found",
   "noIncomeFound": "No Income Found",

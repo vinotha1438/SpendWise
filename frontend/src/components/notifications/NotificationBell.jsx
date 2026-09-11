@@ -28,14 +28,11 @@ function NotificationBell() {
   useEffect(() => {
     fetchNotifications();
 
-    // Light polling so the bell stays roughly up to date without
-    // needing a manual refresh — 60s is plenty for this use case.
     const interval = setInterval(fetchNotifications, 60000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Close the dropdown when clicking outside it.
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -143,7 +140,7 @@ function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-3 w-80 max-w-[90vw] rounded-xl border border-border bg-card shadow-xl">
+        <div className="fixed left-1/2 top-20 z-50 w-[92vw] max-w-sm -translate-x-1/2 rounded-xl border border-border bg-card shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-80 sm:max-w-none sm:translate-x-0">
 
           <div className="flex items-center justify-between border-b border-border p-4 font-bold text-card-foreground">
             <span>Notifications</span>
@@ -189,7 +186,7 @@ function NotificationBell() {
                     </p>
                   </div>
 
-                  <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex shrink-0 gap-1">
 
                     {Number(item.is_read) === 0 && (
                       <button

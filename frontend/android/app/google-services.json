@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "816329870960",
+    "project_id": "neural-ripple-506709-t3",
+    "storage_bucket": "neural-ripple-506709-t3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816329870960:android:975b5f860abbd82f75aeb5",
+        "android_client_info": {
+          "package_name": "com.spendwise.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "816329870960-qmv93sndt10jqmg312docfts4lhp340t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.spendwise.app",
+            "certificate_hash": "062ad9d67da658e4c4eda264f829abf8113565e6"
+          }
+        },
+        {
+          "client_id": "816329870960-ijffk5ma7ckhkohj80gbup58g23ktv8v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWTZ2Tnd8NPAZACwBb3PyNG5yv48IJK3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "816329870960-ijffk5ma7ckhkohj80gbup58g23ktv8v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
