@@ -91,7 +91,7 @@ const loginUser = (req, res) => {
             },
             JWT_SECRET,
             {
-                expiresIn: "1h",
+                expiresIn: "365d",
             }
         );
 
@@ -167,7 +167,7 @@ const googleLogin = async (req, res) => {
                 },
                 JWT_SECRET,
                 {
-                    expiresIn: "1h",
+                    expiresIn: "365d",
                 }
             );
 
