@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 function CategoryPieChart({ expenses = [] }) {
   const categoryTotals = {};
@@ -69,9 +69,8 @@ function CategoryPieChart({ expenses = [] }) {
               outerRadius={105}
               innerRadius={55}
               paddingAngle={2}
-              label={({ name, percent }) =>
-                `${name} ${(percent * 100).toFixed(0)}%`
-              }
+              label={false}
+              labelLine={false}
             >
               {data.map((entry, index) => (
                 <Cell
@@ -80,6 +79,12 @@ function CategoryPieChart({ expenses = [] }) {
                 />
               ))}
             </Pie>
+
+            <Legend
+              formatter={(value) => (
+                <span style={{ fontSize: "12px" }}>{value}</span>
+              )}
+            />
 
             <Tooltip
               formatter={(value) =>

@@ -45,6 +45,7 @@
   "language": "Language",
 
   "expenseHistory": "Expense History",
+  "expenseHistoryDescription": "View, search and manage all your expenses.",
   "incomeHistory": "Income History",
   "viewSearchManageExpenses": "View, search and manage all your expenses.",
   "viewManageEditIncome": "View, manage and edit all your income records.",

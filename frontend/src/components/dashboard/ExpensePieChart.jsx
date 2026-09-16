@@ -73,9 +73,8 @@ function ExpensePieChart({ expenses = [] }) {
                   dataKey="value"
                   nameKey="name"
                   outerRadius={100}
-                  label={({ percent }) =>
-                    `${(percent * 100).toFixed(0)}%`
-                  }
+                  label={false}
+                  labelLine={false}
                 >
                   {data.map((item, index) => (
                     <Cell
