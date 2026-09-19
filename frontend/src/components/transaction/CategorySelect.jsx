@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import API from "../../services/api";
 import AddCategoryModal from "./AddCategoryModal";
+import ManageCategoriesModal from "./ManageCategoriesModal";
 
 function CategorySelect({ value, onChange }) {
   const [categories, setCategories] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showManageModal, setShowManageModal] = useState(false);
 
   const fetchCategories = async () => {
     try {
@@ -45,25 +47,48 @@ function CategorySelect({ value, onChange }) {
         ))}
       </select>
 
-      <button
-        type="button"
-        onClick={() => setShowModal(true)}
-        style={{
-          marginTop: "10px",
-          color: "#14B8A6",
-          fontWeight: "bold",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        ➕ Add New Category
-      </button>
+      <div style={{ display: "flex", gap: "15px", marginTop: "10px" }}>
+        <button
+          type="button"
+          onClick={() => setShowModal(true)}
+          style={{
+            color: "#14B8A6",
+            fontWeight: "bold",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          ➕ Add New Category
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowManageModal(true)}
+          style={{
+            color: "#6B7280",
+            fontWeight: "bold",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          ⚙️ Manage Categories
+        </button>
+      </div>
 
       {showModal && (
         <AddCategoryModal
           onClose={() => setShowModal(false)}
           onSuccess={fetchCategories}
+        />
+      )}
+
+      {showManageModal && (
+        <ManageCategoriesModal
+          categories={categories}
+          onClose={() => setShowManageModal(false)}
+          onChange={fetchCategories}
         />
       )}
     </>

@@ -75,8 +75,36 @@ const deleteCategory = (req, res) => {
   );
 };
 
+// Update Category
+const updateCategory = (req, res) => {
+  const { category_name, icon } = req.body;
+
+  const sql = `
+    UPDATE categories
+    SET category_name = ?, icon = ?
+    WHERE id = ? AND user_id = ?
+  `;
+
+  db.query(
+    sql,
+    [category_name, icon, req.params.id, req.user.id],
+    (err) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to update category",
+        });
+      }
+
+      res.json({
+        message: "Category Updated Successfully",
+      });
+    }
+  );
+};
+
 module.exports = {
   getCategories,
   addCategory,
   deleteCategory,
+  updateCategory,
 };

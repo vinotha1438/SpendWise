@@ -22,4 +22,10 @@ router.delete(
   categoryController.deleteCategory
 );
 
+router.put(
+  "/categories/:id",
+  verifyToken,
+  categoryController.updateCategory
+);
+
 module.exports = router;
