@@ -240,7 +240,8 @@ const getProfile = (req, res) => {
         SELECT
             id,
             full_name,
-            email
+            email,
+            password IS NOT NULL AS has_password
         FROM users
         WHERE id = ?
     `;
@@ -264,9 +265,117 @@ const getProfile = (req, res) => {
     });
 };
 
+// Update Profile (Name)
+const updateProfile = (req, res) => {
+    const { full_name } = req.body;
+
+    if (!full_name || !full_name.trim()) {
+        return res.status(400).json({
+            message: "Name cannot be empty",
+        });
+    }
+
+    const sql = `
+        UPDATE users
+        SET full_name = ?
+        WHERE id = ?
+    `;
+
+    db.query(sql, [full_name.trim(), req.user.id], (err) => {
+        if (err) {
+            console.log(err);
+
+            return res.status(500).json({
+                message: "Failed to update profile",
+            });
+        }
+
+        res.status(200).json({
+            message: "Profile Updated Successfully",
+        });
+    });
+};
+
+// Change Password
+const changePassword = (req, res) => {
+    const { current_password, new_password } = req.body;
+
+    if (!new_password || new_password.length < 6) {
+        return res.status(400).json({
+            message: "New password must be at least 6 characters",
+        });
+    }
+
+    const sql = "SELECT * FROM users WHERE id = ?";
+
+    db.query(sql, [req.user.id], (err, rows) => {
+        if (err) {
+            console.log(err);
+
+            return res.status(500).json({
+                message: "Database Error",
+            });
+        }
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        const user = rows[0];
+
+        // Google-only accounts have no password yet — let them set
+        // one for the first time without checking a "current"
+        // password that never existed.
+        if (user.password) {
+            if (!current_password) {
+                return res.status(400).json({
+                    message: "Current password is required",
+                });
+            }
+
+            const isMatch = bcrypt.compareSync(
+                current_password,
+                user.password
+            );
+
+            if (!isMatch) {
+                return res.status(401).json({
+                    message: "Current password is incorrect",
+                });
+            }
+        }
+
+        const hashedPassword = bcrypt.hashSync(new_password, 10);
+
+        const updateSql = `
+            UPDATE users
+            SET password = ?
+            WHERE id = ?
+        `;
+
+        db.query(updateSql, [hashedPassword, req.user.id], (updateErr) => {
+            if (updateErr) {
+                console.log(updateErr);
+
+                return res.status(500).json({
+                    message: "Failed to change password",
+                });
+            }
+
+            res.status(200).json({
+                message: "Password Changed Successfully",
+            });
+        });
+    });
+};
+
 module.exports = {
     registerUser,
     loginUser,
     googleLogin,
     getProfile,
+    updateProfile,
+    changePassword,
 };

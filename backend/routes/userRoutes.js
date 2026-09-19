@@ -7,7 +7,9 @@ const {
     registerUser,
     loginUser,
     googleLogin,
-    getProfile
+    getProfile,
+    updateProfile,
+    changePassword,
 } = require("../controllers/userControllers");
 
 // Register API
@@ -21,5 +23,11 @@ router.post("/google-login", googleLogin);
 
 // Profile API
 router.get("/profile", verifyToken, getProfile);
+
+// Update Profile API
+router.put("/profile", verifyToken, updateProfile);
+
+// Change Password API
+router.put("/profile/password", verifyToken, changePassword);
 
 module.exports = router;
