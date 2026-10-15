@@ -1,5 +1,17 @@
 import { Pencil, Trash2 } from "lucide-react";
 
+const formatDateTime = (value) => {
+  if (!value) return "-";
+  return new Date(String(value).replace("Z", "")).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
 function TransactionTable({
   expenses = [],
   onEdit,
@@ -71,12 +83,7 @@ function TransactionTable({
             </div>
 
             <p className="mt-3 text-sm text-muted-foreground">
-              📅{" "}
-              {expense.expense_date
-                ? new Date(
-                    expense.expense_date
-                  ).toLocaleDateString("en-IN")
-                : "-"}
+              📅 {formatDateTime(expense.expense_date)}
             </p>
 
             <div className="mt-4 flex gap-2">
@@ -143,7 +150,7 @@ function TransactionTable({
               </th>
 
               <th className="px-4 py-3 text-left">
-                Date
+                Date & Time
               </th>
 
               <th className="px-4 py-3 text-center">
@@ -193,11 +200,7 @@ function TransactionTable({
                 </td>
 
                 <td className="px-4 py-4 text-muted-foreground">
-                  {expense.expense_date
-                    ? new Date(
-                        expense.expense_date
-                      ).toLocaleDateString("en-IN")
-                    : "-"}
+                  {formatDateTime(expense.expense_date)}
                 </td>
 
                 <td className="px-4 py-4">

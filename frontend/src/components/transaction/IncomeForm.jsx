@@ -4,6 +4,16 @@ import toast from "react-hot-toast";
 import { useData } from "../../context/DataContext";
 import CategorySelect from "./CategorySelect";
 
+const getNowLocal = () => {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+};
+
+const toInputValue = (value) => String(value).replace("Z", "").slice(0, 16);
+
+const toMySQLDateTime = (value) => value.replace("T", " ") + ":00";
+
 function IncomeForm({
   incomeToEdit = null,
   onSuccess = () => {},
@@ -18,7 +28,7 @@ function IncomeForm({
   const [accountId, setAccountId] = useState(incomeToEdit?.account_id || "");
 
   const [incomeDate, setIncomeDate] = useState(
-    incomeToEdit?.income_date ? incomeToEdit.income_date.substring(0, 10) : ""
+    incomeToEdit?.income_date ? toInputValue(incomeToEdit.income_date) : getNowLocal()
   );
 
   const [notes, setNotes] = useState(incomeToEdit?.notes || "");
@@ -38,7 +48,7 @@ function IncomeForm({
         category,
         payment_method: paymentMethod,
         account_id: Number(accountId),
-        income_date: incomeDate,
+        income_date: toMySQLDateTime(incomeDate),
         notes,
       };
 
@@ -62,7 +72,7 @@ function IncomeForm({
         setCategory("");
         setPaymentMethod("");
         setAccountId("");
-        setIncomeDate("");
+        setIncomeDate(getNowLocal());
         setNotes("");
       }
 
@@ -122,20 +132,13 @@ function IncomeForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-semibold">Income Date</label>
-        <div className="relative">
-          <input
-            type="date"
-            className="w-full rounded-lg border p-2"
-            value={incomeDate}
-            onChange={(e) => setIncomeDate(e.target.value)}
-          />
-          {!incomeDate && (
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-              dd-mm-yyyy
-            </span>
-          )}
-        </div>
+        <label className="mb-1 block text-sm font-semibold">Income Date & Time</label>
+        <input
+          type="datetime-local"
+          className="w-full rounded-lg border p-2"
+          value={incomeDate}
+          onChange={(e) => setIncomeDate(e.target.value)}
+        />
       </div>
 
       <textarea

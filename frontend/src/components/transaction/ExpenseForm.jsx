@@ -4,6 +4,17 @@ import PaymentSelect from "./PaymentSelect";
 import API from "../../services/api";
 import { useData } from "../../context/DataContext";
 
+// Ippo irukkura date & time (India time)
+const getNowLocal = () => {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+};
+
+const toInputValue = (value) => String(value).replace("Z", "").slice(0, 16);
+
+const toMySQLDateTime = (value) => value.replace("T", " ") + ":00";
+
 function ExpenseForm({
   expense = null,
   isEdit = false,
@@ -19,7 +30,7 @@ function ExpenseForm({
   const [accountId, setAccountId] = useState(expense?.account_id || "");
 
   const [expenseDate, setExpenseDate] = useState(
-    expense?.expense_date ? expense.expense_date.substring(0, 10) : ""
+    expense?.expense_date ? toInputValue(expense.expense_date) : getNowLocal()
   );
 
   const [notes, setNotes] = useState(expense?.notes || "");
@@ -43,7 +54,7 @@ function ExpenseForm({
         category,
         payment_method: paymentMethod,
         account_id: Number(accountId),
-        expense_date: expenseDate,
+        expense_date: toMySQLDateTime(expenseDate),
         notes,
       };
 
@@ -68,7 +79,7 @@ function ExpenseForm({
         setCategory("");
         setPaymentMethod("");
         setAccountId("");
-        setExpenseDate("");
+        setExpenseDate(getNowLocal());
         setNotes("");
       }
 
@@ -130,20 +141,13 @@ function ExpenseForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-semibold">Expense Date</label>
-        <div className="relative">
-          <input
-            type="date"
-            className="w-full border rounded-lg p-2"
-            value={expenseDate}
-            onChange={(e) => setExpenseDate(e.target.value)}
-          />
-          {!expenseDate && (
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-              dd-mm-yyyy
-            </span>
-          )}
-        </div>
+        <label className="mb-1 block text-sm font-semibold">Expense Date & Time</label>
+        <input
+          type="datetime-local"
+          className="w-full border rounded-lg p-2"
+          value={expenseDate}
+          onChange={(e) => setExpenseDate(e.target.value)}
+        />
       </div>
 
       <textarea
